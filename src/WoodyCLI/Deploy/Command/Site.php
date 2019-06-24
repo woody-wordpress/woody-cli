@@ -56,7 +56,7 @@ class Site extends WoodyCommand
         $this->site_config = $this->getSiteConfiguration();
 
         // Site access locked
-        if (!empty($this->site_config['WP_ACCESS_LOCKED']) && ($this->site_config['WP_ACCESS_LOCKED'] == true || $this->site_config['WP_ACCESS_LOCKED'] == 'true')) {
+        if (!empty($this->site_config['WOODY_ACCESS_LOCKED']) && $this->site_config['WOODY_ACCESS_LOCKED']) {
             $this->consoleH1($this->output, sprintf('Projet "%s" fermé', $this->site_key));
         } else {
             $this->site_dir = sprintf(self::WP_SITE_DIR, $this->site_key);
