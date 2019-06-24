@@ -1,0 +1,70 @@
+#!/usr/bin/env php
+<?php
+
+use Symfony\Component\Console\Application;
+use WoodyCLI\Deploy;
+
+if (PHP_SAPI !== 'cli') {
+    echo 'Warning: Woody CLI should be invoked via the CLI version of PHP, not the ' . PHP_SAPI . ' SAPI' . PHP_EOL;
+}
+
+// Directories
+$baseDir = dirname(dirname(__FILE__));
+$vendorDir = dirname(dirname($baseDir));
+define('BASE_DIR', $baseDir);
+define('VENDOR_DIR', $vendorDir);
+
+define('WP_ROOT_DIR', dirname(VENDOR_DIR)); // ../current
+define('WP_DEPLOY_DIR', dirname(WP_ROOT_DIR));
+
+// PHP Error
+error_reporting(-1);
+
+// This code references Composer.
+if (function_exists('ini_set')) {
+    @ini_set('display_errors', 1);
+
+    $memoryInBytes = function ($value) {
+        $unit = strtolower(substr($value, -1, 1));
+        $value = (int)$value;
+        switch ($unit) {
+            case 'g':
+                $value *= 1024;
+                // no break (cumulative multiplier)
+            case 'm':
+                $value *= 1024;
+                // no break (cumulative multiplier)
+            case 'k':
+                $value *= 1024;
+        }
+
+        return $value;
+    };
+
+    $memoryLimit = trim(ini_get('memory_limit'));
+    // Increase memory_limit if it is lower than 512M
+    if ($memoryLimit != -1 && $memoryInBytes($memoryLimit) < 512 * 1024 * 1024) {
+        @ini_set('memory_limit', '512M');
+    }
+    unset($memoryInBytes, $memoryLimit);
+}
+
+if (is_file(VENDOR_DIR . '/autoload.php')) {
+    require_once VENDOR_DIR . '/autoload.php';
+} else {
+    throw new Exception('Couldn\'t find an autoloader. Has composer install been ran?');
+}
+
+/**
+ * Init of the Woody CLI Application
+ */
+$app = new Application();
+$app->setName('Woody CLI');
+$app->setVersion('v1.0');
+
+//Tools commands
+$app->add(new Deploy\Command\Site());
+$app->add(new Deploy\Command\Sites());
+$app->add(new Deploy\Command\Core());
+
+$app->run();

@@ -1,0 +1,12 @@
+# Common ignore
+.DS_Store
+.Thumbs
+.idea
+._*
+*.log
+node_modules
+composer.lock
+
+# Composer
+vendor/*
+!vendor/.gitkeep
