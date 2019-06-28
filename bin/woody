@@ -26,7 +26,7 @@ if (function_exists('ini_set')) {
 
     $memoryInBytes = function ($value) {
         $unit = strtolower(substr($value, -1, 1));
-        $value = (int)$value;
+        $value = (int) $value;
         switch ($unit) {
             case 'g':
                 $value *= 1024;
@@ -60,7 +60,7 @@ if (is_file(VENDOR_DIR . '/autoload.php')) {
  */
 $app = new Application();
 $app->setName('Woody CLI');
-$app->setVersion('v1.3');
+$app->setVersion('v1.3.1');
 
 //Tools commands
 $app->add(new Deploy\Command\Site());
