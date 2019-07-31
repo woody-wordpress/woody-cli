@@ -1,6 +1,24 @@
 #!/usr/bin/env php
 <?php
 
+/**
+ * Plugin Name: Woody CI
+ * Plugin URI: https://github.com/woody-wordpress/woody-cli
+ * Version: 1.3.3
+ * Description: A PHP CLI interface to deploy Woody website
+ * Author: Raccourci Agency
+ * Author URI: https://www.raccourci.fr
+ * License: GPL2
+ *
+ * This program is GLP but; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of.
+ */
+
 use Symfony\Component\Console\Application;
 use WoodyCLI\Deploy;
 
@@ -60,7 +78,7 @@ if (is_file(VENDOR_DIR . '/autoload.php')) {
  */
 $app = new Application();
 $app->setName('Woody CLI');
-$app->setVersion('v1.3.2');
+$app->setVersion('v1.3.3');
 
 //Tools commands
 $app->add(new Deploy\Command\Site());
