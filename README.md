@@ -12,14 +12,14 @@
 
 A PHP CLI interface to deploy Woody website
 
-## 👉🏻 Installation
+## :fire: Installation
 
 First, install Woody CLI via the Composer package manager:
 ```bash
 composer require woody-wordpress/woody-cli
 ```
 
-## 🔥 Usage
+## :rocket: Usage
 
 > **Help:**
 
@@ -56,7 +56,7 @@ This command includes options :
 ./bin/woody deploy:sites
 ```
 
-## 👏 Contributors
+## :metal: Contributors
 
 Thank you to all the people who have already contributed to Woody CLI !<br/>
 For future contributors, please read our [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md)
@@ -64,11 +64,11 @@ For future contributors, please read our [Contributor Covenant Code of Conduct](
 Header photo by [John Lee on Unsplash](https://unsplash.com/@john_artifexfilms?utm_medium=referral&utm_campaign=photographer-credit&utm_content=creditBadge)<br/>
 [![Header photo by John Lee on Unsplash](https://img.shields.io/badge/John%20Lee-black.svg?style=flat-square&logo=unsplash&logoWidth=10)](https://unsplash.com/@john_artifexfilms?utm_medium=referral&utm_campaign=photographer-credit&utm_content=creditBadge)
 
-## 🆓 License
+## :bookmark: License
 
 Woody CLI is open-sourced software licensed under the [GPL2](LICENSE).
 
-## 💝 Sponsoring
+## :crown: Sponsoring
 
 Woody is a digital ecosystem co-financed by the Regional Tourism Committee of Brittany for [eBreizh Connexion](http://www.ebreizhconnexion.bzh)
 
