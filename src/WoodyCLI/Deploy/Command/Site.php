@@ -87,18 +87,22 @@ class Site extends WoodyCommand
 
             if ($this->is_cloned) {
                 $this->wp_install();
-                if (!in_array('no-gulp', $options)) {
+                if (!in_array('no-gulp', $options) && !in_array('speed', $options)) {
                     $this->wp_assets();
                 }
 
                 $this->wp_flush_cache();
 
-                if (!in_array('no-twig', $options)) {
+                if (!in_array('no-twig', $options) && !in_array('speed', $options)) {
                     $this->wp_flush_timber();
                 }
 
-                if (!in_array('no-varnish', $options)) {
+                if (!in_array('no-varnish', $options) && !in_array('speed', $options)) {
                     $this->wp_varnish_flush();
+                }
+
+                if (!in_array('no-sso', $options) && !in_array('speed', $options)) {
+                    $this->wp_add_sso_domains();
                 }
             } else {
                 $this->consoleH2($this->output, sprintf('Le projet "%s" n\'a jamais été déployé', $this->site_key));
@@ -221,5 +225,12 @@ class Site extends WoodyCommand
     {
         $this->consoleH2($this->output, 'Purge du VARNISH');
         $this->wp('woody_flush_varnish');
+    }
+
+    // WP Add SSO Domains
+    private function wp_add_sso_domains()
+    {
+        $this->consoleH2($this->output, 'Autorisation SSO');
+        $this->wp('woody_add_sso_domains');
     }
 }
