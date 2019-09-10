@@ -86,19 +86,37 @@ class Site extends WoodyCommand
             $this->is_cloned = $this->fs->exists(sprintf(self::WP_SITE_DIR, $this->site_key) . '/style.css');
 
             if ($this->is_cloned) {
-                $this->wp_install();
+
+                if (!in_array('no-install', $options) && !in_array('speed', $options)) {
+                    $this->wp_install();
+                }
+
+                if (!in_array('no-updb', $options) && !in_array('speed', $options)) {
+                    $this->wp_database_update();
+                }
+
+                if (!in_array('no-acf', $options) && !in_array('speed', $options)) {
+                    $this->wp_acf_sync();
+                }
+
                 if (!in_array('no-gulp', $options) && !in_array('speed', $options)) {
                     $this->wp_assets();
                 }
 
-                $this->wp_flush_cache();
+                if (!in_array('no-cache', $options)) {
+                    $this->wp_flush_cache();
+                }
 
-                if (!in_array('no-twig', $options) && !in_array('speed', $options)) {
+                if (!in_array('no-warm', $options) && !in_array('speed', $options)) {
+                    $this->wp_cache_warm();
+                }
+
+                if (!in_array('no-twig', $options)) {
                     $this->wp_flush_timber();
                 }
 
                 if (!in_array('no-varnish', $options) && !in_array('speed', $options)) {
-                    $this->wp_varnish_flush();
+                    $this->wp_flush_varnish();
                 }
 
                 if (!in_array('no-sso', $options) && !in_array('speed', $options)) {
@@ -133,7 +151,7 @@ class Site extends WoodyCommand
         $this->wp_unlock();
     }
 
-    // WP Env file
+    // WP Install
     private function wp_install()
     {
         $this->consoleH2($this->output, 'Woody Install');
@@ -171,12 +189,20 @@ class Site extends WoodyCommand
 
         $this->consoleList($this->output, 'Génération du fichier woody-cli.lock');
         $this->wp_lock();
+    }
 
+    // WP Database Update
+    private function wp_database_update()
+    {
         // Woody Update Database
         $this->consoleH2($this->output, 'Mise à jour de la BDD');
         $this->wp('core update-db');
         $this->wp('redirection database upgrade');
+    }
 
+    // WP ACF Sync
+    private function wp_acf_sync()
+    {
         // Woody ACF sync
         if ($this->site_key == 'superot' && $this->env == 'dev') {
             $this->consoleH2($this->output, 'ACF sync');
@@ -213,6 +239,13 @@ class Site extends WoodyCommand
         $this->wp('woody_flush_cache');
     }
 
+    // WP Cache Warm
+    private function wp_cache_warm()
+    {
+        $this->consoleH2($this->output, 'Génération du CACHE');
+        $this->wp('woody_cache_warm');
+    }
+
     // WP Cache Flush Twig
     private function wp_flush_timber()
     {
@@ -221,7 +254,7 @@ class Site extends WoodyCommand
     }
 
     // WP Varnish Flush
-    private function wp_varnish_flush()
+    private function wp_flush_varnish()
     {
         $this->consoleH2($this->output, 'Purge du VARNISH');
         $this->wp('woody_flush_varnish');
