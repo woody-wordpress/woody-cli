@@ -88,39 +88,43 @@ class Site extends WoodyCommand
             if ($this->is_cloned) {
 
                 if (!in_array('no-install', $options) && !in_array('speed', $options)) {
-                    $this->wp_install();
+                    $this->woody_install();
                 }
 
                 if (!in_array('no-updb', $options) && !in_array('speed', $options)) {
-                    $this->wp_database_update();
+                    $this->woody_database_update();
                 }
 
                 if (!in_array('no-acf', $options) && !in_array('speed', $options)) {
-                    $this->wp_acf_sync();
+                    $this->woody_acf_sync();
                 }
 
                 if (!in_array('no-gulp', $options) && !in_array('speed', $options)) {
-                    $this->wp_assets();
+                    $this->woody_assets();
                 }
 
                 if (!in_array('no-cache', $options)) {
-                    $this->wp_flush_cache();
+                    if (!in_array('no-cache-site', $options)) {
+                        $this->woody_flush_site();
+                    }
+
+                    $this->woody_flush_core();
                 }
 
                 if (!in_array('no-warm', $options) && !in_array('speed', $options)) {
-                    $this->wp_cache_warm();
+                    $this->woody_cache_warm();
                 }
 
                 if (!in_array('no-twig', $options)) {
-                    $this->wp_flush_timber();
+                    $this->woody_flush_twig();
                 }
 
                 if (!in_array('no-varnish', $options) && !in_array('speed', $options)) {
-                    $this->wp_flush_varnish();
+                    $this->woody_flush_varnish();
                 }
 
                 if (!in_array('no-sso', $options) && !in_array('speed', $options)) {
-                    $this->wp_add_sso_domains();
+                    $this->woody_add_sso_domains();
                 }
             } else {
                 $this->consoleH2($this->output, sprintf('Le projet "%s" n\'a jamais été déployé', $this->site_key));
@@ -152,7 +156,7 @@ class Site extends WoodyCommand
     }
 
     // WP Install
-    private function wp_install()
+    private function woody_install()
     {
         $this->consoleH2($this->output, 'Woody Install');
 
@@ -192,7 +196,7 @@ class Site extends WoodyCommand
     }
 
     // WP Database Update
-    private function wp_database_update()
+    private function woody_database_update()
     {
         // Woody Update Database
         $this->consoleH2($this->output, 'Mise à jour de la BDD');
@@ -201,7 +205,7 @@ class Site extends WoodyCommand
     }
 
     // WP ACF Sync
-    private function wp_acf_sync()
+    private function woody_acf_sync()
     {
         // Woody ACF sync
         if ($this->site_key == 'superot' && $this->env == 'dev') {
@@ -226,42 +230,49 @@ class Site extends WoodyCommand
     }
 
     // WP Env file
-    private function wp_assets()
+    private function woody_assets()
     {
         $this->consoleH2($this->output, 'Compilation des Assets');
         $this->execIn(self::WP_ROOT_DIR . '/gulp', 'yarn build --site ' . $this->site_key . ' --env ' . $this->env);
     }
 
-    // WP Cache Flush
-    private function wp_flush_cache()
+    // WP Cache Flush Core
+    private function woody_flush_core()
     {
-        $this->consoleH2($this->output, 'Nettoyage du CACHE GLOBAL');
-        $this->wp('woody_flush_cache');
+        $this->consoleH2($this->output, 'Nettoyage du CACHE du CORE');
+        $this->wp('woody_flush_core');
+    }
+
+    // WP Cache Flush Site
+    private function woody_flush_site()
+    {
+        $this->consoleH2($this->output, 'Nettoyage du CACHE du SITE');
+        $this->wp('woody_flush_site');
     }
 
     // WP Cache Warm
-    private function wp_cache_warm()
+    private function woody_cache_warm()
     {
         $this->consoleH2($this->output, 'Génération du CACHE');
         $this->wp('woody_cache_warm');
     }
 
     // WP Cache Flush Twig
-    private function wp_flush_timber()
+    private function woody_flush_twig()
     {
         $this->consoleH2($this->output, 'Nettoyage du CACHE TWIG');
-        $this->wp('woody_flush_timber');
+        $this->wp('woody_flush_twig');
     }
 
     // WP Varnish Flush
-    private function wp_flush_varnish()
+    private function woody_flush_varnish()
     {
         $this->consoleH2($this->output, 'Purge du VARNISH');
         $this->wp('woody_flush_varnish');
     }
 
     // WP Add SSO Domains
-    private function wp_add_sso_domains()
+    private function woody_add_sso_domains()
     {
         $this->consoleH2($this->output, 'Autorisation SSO');
         $this->wp('woody_add_sso_domains');
