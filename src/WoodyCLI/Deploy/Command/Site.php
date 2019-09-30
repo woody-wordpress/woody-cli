@@ -87,6 +87,13 @@ class Site extends WoodyCommand
 
             if ($this->is_cloned) {
 
+                // Le fichier "deploy.lock" permet de désactiver l'utilisation du cache Twig
+                if (!in_array('multi-site', $options)) {
+                    $this->consoleH2($this->output, 'Initialisation du déploiement');
+                    $this->fs->dumpFile(self::WP_CACHE_DIR . '/deploy.lock', time());
+                    $this->consoleList($this->output, 'Génération du fichier deploy.lock');
+                }
+
                 if (!in_array('no-install', $options) && !in_array('speed', $options)) {
                     $this->woody_install();
                 }
@@ -125,6 +132,13 @@ class Site extends WoodyCommand
 
                 if (!in_array('no-sso', $options) && !in_array('speed', $options)) {
                     $this->woody_add_sso_domains();
+                }
+
+                // Le fichier "deploy.lock" permet de désactiver l'utilisation du cache Twig
+                if (!in_array('multi-site', $options)) {
+                    $this->consoleH2($this->output, 'Finalisation du déploiement');
+                    $this->fs->remove(self::WP_CACHE_DIR . '/deploy.lock');
+                    $this->consoleList($this->output, 'Suppression du fichier deploy.lock');
                 }
             } else {
                 $this->consoleH2($this->output, sprintf('Le projet "%s" n\'a jamais été déployé', $this->site_key));

@@ -53,6 +53,11 @@ class Sites extends WoodyCommand
 
         $sites = $this->loadSites();
 
+        // Le fichier "deploy.lock" permet de désactiver l'utilisation du cache Twig
+        $this->consoleH1($this->output, 'Initialisation du déploiement');
+        $this->fs->dumpFile(self::WP_CACHE_DIR . '/deploy.lock', time());
+        $this->consoleList($this->output, 'Génération du fichier deploy.lock');
+
         $this->consoleH1($this->output, 'Woody Multi-Site');
         $i = 1;
         $nb_sites = count($sites);
@@ -62,5 +67,10 @@ class Sites extends WoodyCommand
             $this->exec(sprintf('woody deploy:site -s %s -e %s -o %s', $site_key, $env, $options));
             $i++;
         }
+
+        // Le fichier "deploy.lock" permet de désactiver l'utilisation du cache Twig
+        $this->consoleH1($this->output, 'Finalisation du déploiement');
+        $this->fs->remove(self::WP_CACHE_DIR . '/deploy.lock');
+        $this->consoleList($this->output, 'Suppression du fichier deploy.lock');
     }
 }
