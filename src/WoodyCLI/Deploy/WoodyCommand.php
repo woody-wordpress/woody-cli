@@ -45,6 +45,11 @@ abstract class WoodyCommand extends AbstractCommand
     /**
      * Path to site directory
      */
+    const WP_CACHE_DIR = self::WP_ROOT_DIR . '/web/app/cache';
+
+    /**
+     * Path to site directory
+     */
     const WP_DEPLOY_SITE_DIR = WP_DEPLOY_DIR . '/sites/%s/current';
 
     /**
