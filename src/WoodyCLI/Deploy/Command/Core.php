@@ -2,7 +2,7 @@
 
 namespace WoodyCLI\Deploy\Command;
 
-use WoodyCLI\Deploy\WoodyCommand;
+use WoodyCLI\WoodyCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

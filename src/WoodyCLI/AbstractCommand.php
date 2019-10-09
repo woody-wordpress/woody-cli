@@ -256,9 +256,9 @@ abstract class AbstractCommand extends Command
         }
     }
 
-    protected function consoleExec($output, $msg)
+    protected function consoleExec($output, $msg, $color = 'green')
     {
-        $style = new OutputFormatterStyle('green', null, array());
+        $style = new OutputFormatterStyle($color, null, array());
         $output->getFormatter()->setStyle('cmd', $style);
         $output->writeln(sprintf('<cmd>- %s</>', $msg));
     }
