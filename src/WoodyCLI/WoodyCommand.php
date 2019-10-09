@@ -1,6 +1,6 @@
 <?php
 
-namespace WoodyCLI\Deploy;
+namespace WoodyCLI;
 
 use WoodyCLI\AbstractCommand;
 use Symfony\Component\Filesystem\Filesystem;
@@ -21,6 +21,11 @@ abstract class WoodyCommand extends AbstractCommand
      * Path to core directory
      */
     const WP_ROOT_DIR = WP_DEPLOY_DIR . '/current';
+
+    /**
+     * Path to core directory
+     */
+    const WP_VENDOR_DIR = WP_ROOT_DIR . '/vendor';
 
     /**
      * Path to the configuration file of a site (with wildcard)
