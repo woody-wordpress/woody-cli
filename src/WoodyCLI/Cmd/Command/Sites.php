@@ -66,7 +66,7 @@ class Sites extends WoodyCommand
                 $this->consoleH1($this->output, sprintf('Projet "%s" fermé', $this->site_key));
             } else {
                 $this->consoleExec($this->output, sprintf('WP_SITEKEY=%s wp %s', $site_key, $wp));
-                $this->exec(sprintf('WP_SITEKEY=%s wp %s', $site_key, $wp));
+                $this->exec(sprintf('WP_SITE_KEY=%s wp %s', $site_key, $wp));
             }
             $i++;
         }
