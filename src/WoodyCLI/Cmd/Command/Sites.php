@@ -1,6 +1,6 @@
 <?php
 
-namespace WoodyCLI\Deploy\Command;
+namespace WoodyCLI\Cmd\Command;
 
 use WoodyCLI\WoodyCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -32,10 +32,10 @@ class Sites extends WoodyCommand
     public function configure()
     {
         $this
-            ->setName('deploy:sites')
-            ->setDescription('Déployer tous les sites')
+            ->setName('cmd:sites')
+            ->setDescription('Commande WP sur tous les sites')
             // Options
-            ->addOption('options', 'o', InputOption::VALUE_OPTIONAL, 'Options (force,no-gulp,no-twig)')
+            ->addOption('wp', 'wp', InputOption::VALUE_OPTIONAL, 'Commande')
             ->addOption('env', 'e', InputOption::VALUE_OPTIONAL, 'Environnement', 'dev');
     }
 
@@ -47,30 +47,28 @@ class Sites extends WoodyCommand
         $this->input = $input;
         $this->output = $output;
 
-        $options = $input->getOption('options');
+        $wp = $input->getOption('wp');
         $env = $input->getOption('env');
         $this->setEnv($env);
 
         $sites = $this->loadSites();
 
-        // Le fichier "deploy.lock" permet de désactiver l'utilisation du cache Twig
-        $this->consoleH1($this->output, 'Initialisation du déploiement');
-        $this->fs->dumpFile(self::WP_CACHE_DIR . '/deploy.lock', time());
-        $this->consoleList($this->output, 'Génération du fichier deploy.lock');
-
-        $this->consoleH1($this->output, 'Woody Deploy Multi-Site');
+        $this->consoleH1($this->output, 'Woody Command Multi-Site');
         $i = 1;
         $nb_sites = count($sites);
         foreach ($sites as $site_key => $site_config) {
             $this->consoleH2($this->output, sprintf('%s/%s %s', $i, $nb_sites, $site_key));
-            $this->consoleExec($this->output, sprintf('woody deploy:site -s %s -e %s -o %s', $site_key, $env, $options));
-            $this->exec(sprintf('woody deploy:site -s %s -e %s -o %s', $site_key, $env, $options));
+            $site_config = $this->getSiteConfiguration($site_key);
+            $is_cloned = $this->fs->exists(sprintf(self::WP_SITE_DIR, $site_key) . '/style.css');
+
+            // Site access locked
+            if (!$is_cloned || (!empty($site_config['WOODY_ACCESS_LOCKED']) && $site_config['WOODY_ACCESS_LOCKED'])) {
+                $this->consoleH1($this->output, sprintf('Projet "%s" fermé', $this->site_key));
+            } else {
+                $this->consoleExec($this->output, sprintf('WP_SITEKEY=%s wp %s', $site_key, $wp));
+                $this->exec(sprintf('WP_SITEKEY=%s wp %s', $site_key, $wp));
+            }
             $i++;
         }
-
-        // Le fichier "deploy.lock" permet de désactiver l'utilisation du cache Twig
-        $this->consoleH1($this->output, 'Finalisation du déploiement');
-        $this->fs->remove(self::WP_CACHE_DIR . '/deploy.lock');
-        $this->consoleList($this->output, 'Suppression du fichier deploy.lock');
     }
 }
