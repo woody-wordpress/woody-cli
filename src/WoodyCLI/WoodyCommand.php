@@ -187,12 +187,16 @@ abstract class WoodyCommand extends AbstractCommand
      * @return array|bool
      * @todo Return a default configuration
      */
-    protected function getSiteConfiguration()
+    protected function getSiteConfiguration($site_key = null)
     {
         $return = [];
 
         if (empty($this->sites)) {
             $this->sites = $this->loadSites();
+        }
+
+        if (!empty($site_key)) {
+            $this->site_key = $site_key;
         }
 
         if (empty($this->site_key) || empty($this->sites[$this->site_key])) {
