@@ -130,6 +130,10 @@ class Site extends WoodyCommand
                     $this->woody_flush_varnish();
                 }
 
+                if (!in_array('no-cdn', $options) && !in_array('speed', $options)) {
+                    $this->woody_flush_cloudflare();
+                }
+
                 if (!in_array('no-sso', $options) && !in_array('speed', $options)) {
                     $this->woody_add_sso_domains();
                 }
@@ -283,6 +287,13 @@ class Site extends WoodyCommand
     {
         $this->consoleH2($this->output, 'Purge du VARNISH');
         $this->wp('woody_flush_varnish');
+    }
+
+    // WP CDN CLOUDFLARE Flush
+    private function woody_flush_cloudflare()
+    {
+        $this->consoleH2($this->output, 'Purge du CDN CLOUDFLARE');
+        $this->wp('woody_flush_cloudflare');
     }
 
     // WP Add SSO Domains

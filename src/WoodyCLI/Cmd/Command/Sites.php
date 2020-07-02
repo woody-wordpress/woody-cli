@@ -65,7 +65,7 @@ class Sites extends WoodyCommand
             if (!$is_cloned || (!empty($site_config['WOODY_ACCESS_LOCKED']) && $site_config['WOODY_ACCESS_LOCKED'])) {
                 $this->consoleH1($this->output, sprintf('Projet "%s" fermé', $this->site_key));
             } else {
-                $this->consoleExec($this->output, sprintf('WP_SITEKEY=%s wp %s', $site_key, $wp));
+                $this->consoleExec($this->output, sprintf('WP_SITE_KEY=%s wp %s', $site_key, $wp));
                 $this->exec(sprintf('WP_SITE_KEY=%s wp %s', $site_key, $wp));
             }
             $i++;
