@@ -35,7 +35,8 @@ class Core extends WoodyCommand
     {
         $this
             ->setName('build:core')
-            ->setDescription('Build de la version LITE du Core');
+            ->setDescription('Build de la version LITE du Core')
+            ->addOption('tag', 't', InputOption::VALUE_OPTIONAL, 'Tag Version', 'latest');
     }
 
     /**
@@ -55,6 +56,11 @@ class Core extends WoodyCommand
         }
 
         $this->exec('git clone git@github.com:woody-wordpress-pro/woody-core.git ' . self::WP_CORE_DIR);
+
+        $tag = $input->getOption('tag');
+        if ($tag != 'latest') {
+            $this->execIn(self::WP_CORE_DIR, 'git checkout tags/' . $tag);
+        }
 
         if (file_exists(self::WP_CORE_DIR_COPY_GIT)) {
             $this->consoleH2($this->output, sprintf('Nettoyage woody-core (dossier GIT temporaire)'));
@@ -140,7 +146,7 @@ class Core extends WoodyCommand
         }
 
         try {
-            $this->execIn(self::WP_CORE_DIR, 'git push --set-upstream origin master');
+            $this->execIn(self::WP_CORE_DIR, 'git push --set-upstream origin master --tags');
         } catch (\RuntimeException $e) {
             //$this->consoleExec($this->output, $e->getMessage());
         }
