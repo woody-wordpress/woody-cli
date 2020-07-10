@@ -106,6 +106,8 @@ class Site extends WoodyCommand
                     $this->woody_acf_sync();
                 }
 
+                $this->woody_maintenance_on();
+
                 if (!in_array('no-gulp', $options) && !in_array('speed', $options)) {
                     $this->woody_assets();
                 }
@@ -121,6 +123,8 @@ class Site extends WoodyCommand
                 if (!in_array('no-warm', $options) && !in_array('speed', $options)) {
                     $this->woody_cache_warm();
                 }
+
+                $this->woody_maintenance_off();
 
                 if (!in_array('no-twig', $options)) {
                     $this->woody_flush_twig();
@@ -247,7 +251,21 @@ class Site extends WoodyCommand
         }
     }
 
-    // WP Env file
+    // WP Maintenance ON
+    private function woody_maintenance_on()
+    {
+        $this->consoleH2($this->output, 'Mode maintenance ON');
+        $this->execIn(self::WP_CONFIG_DIRS . '/' . $this->site_key, "sed -i \"s/WOODY_MAINTENANCE='false'/WOODY_MAINTENANCE='true'/\" .env");
+    }
+
+    // WP Maintenance OFF
+    private function woody_maintenance_off()
+    {
+        $this->consoleH2($this->output, 'Mode maintenance OFF');
+        $this->execIn(self::WP_CONFIG_DIRS . '/' . $this->site_key, "sed -i \"s/WOODY_MAINTENANCE='true'/WOODY_MAINTENANCE='false'/\" .env");
+    }
+
+    // WP Assets
     private function woody_assets()
     {
         $this->consoleH2($this->output, 'Compilation des Assets');
