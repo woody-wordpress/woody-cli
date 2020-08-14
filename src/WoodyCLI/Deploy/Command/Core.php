@@ -20,9 +20,6 @@ class Core extends WoodyCommand
 {
     protected $input;
     protected $output;
-    protected $update;
-    protected $is_install;
-    protected $site_dir;
 
     /**
      * {inheritdoc}

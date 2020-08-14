@@ -4,7 +4,7 @@
 /**
  * Plugin Name: Woody CI
  * Plugin URI: https://github.com/woody-wordpress/woody-cli
- * Version: 1.7.0
+ * Version: 1.10.0
  * Description: A PHP CLI interface to deploy Woody website
  * Author: Raccourci Agency
  * Author URI: https://www.raccourci.fr
@@ -20,6 +20,7 @@
  */
 
 use Symfony\Component\Console\Application;
+use WoodyCLI\Backup;
 use WoodyCLI\Deploy;
 use WoodyCLI\Build;
 use WoodyCLI\Cmd;
@@ -80,7 +81,11 @@ if (is_file(VENDOR_DIR . '/autoload.php')) {
  */
 $app = new Application();
 $app->setName('Woody CLI');
-$app->setVersion('1.9.4');
+$app->setVersion('1.10.0');
+
+// Deploy commands
+$app->add(new Backup\Command\Backup());
+$app->add(new Backup\Command\Restore());
 
 // Deploy commands
 $app->add(new Deploy\Command\Site());

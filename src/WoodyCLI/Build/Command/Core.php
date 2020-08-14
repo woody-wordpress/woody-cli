@@ -21,9 +21,6 @@ class Core extends WoodyCommand
 {
     protected $input;
     protected $output;
-    protected $update;
-    protected $is_install;
-    protected $site_dir;
 
     const WP_CORE_DIR = '/tmp/woody-core';
     const WP_CORE_DIR_COPY_GIT = '/tmp/woody-core-git';

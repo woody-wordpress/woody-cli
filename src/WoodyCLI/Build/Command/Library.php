@@ -21,9 +21,6 @@ class Library extends WoodyCommand
 {
     protected $input;
     protected $output;
-    protected $update;
-    protected $is_install;
-    protected $site_dir;
 
     const WP_LIBRARY_DIR = self::WP_VENDOR_DIR . '/woody-wordpress-pro/woody-library';
     const WP_LIBRARY_DIR_COPY = self::WP_VENDOR_DIR . '/woody-wordpress/woody-library';
