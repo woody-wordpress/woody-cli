@@ -21,8 +21,9 @@ class Site extends WoodyCommand
 {
     protected $input;
     protected $output;
-    protected $update;
+    protected $is_exist;
     protected $is_install;
+    protected $is_cloned;
     protected $site_config;
     protected $site_dir;
 

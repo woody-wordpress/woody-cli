@@ -21,10 +21,6 @@ class Sites extends WoodyCommand
 {
     protected $input;
     protected $output;
-    protected $update;
-    protected $is_install;
-    protected $site_config;
-    protected $site_dir;
 
     /**
      * {inheritdoc}
