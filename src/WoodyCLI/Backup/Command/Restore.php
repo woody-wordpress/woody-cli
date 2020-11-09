@@ -83,6 +83,8 @@ class Restore extends WoodyCommand
         } else {
             $this->consoleH2($this->output, sprintf('Le projet "%s" n\'a jamais été déployé', $this->site_key));
         }
+
+        return WoodyCommand::SUCCESS;
     }
 
     private function restore_uploads()
