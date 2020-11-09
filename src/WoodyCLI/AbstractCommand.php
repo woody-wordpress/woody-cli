@@ -89,7 +89,12 @@ abstract class AbstractCommand extends Command
             $timeout = $this->timeout;
         }
 
-        $process = new Process([$command]);
+        // if (!is_array($command)) {
+        //     $command = explode(' ', $command);
+        // }
+
+        $process = new Process([]);
+        $process = Process::fromShellCommandline($command);
         $process->setTimeout($timeout);
         $process->run((true === $this->mute || $forcemute) ? null : $this->processBufferCallback);
 

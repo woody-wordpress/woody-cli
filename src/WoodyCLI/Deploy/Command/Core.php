@@ -57,5 +57,7 @@ class Core extends WoodyCommand
             $this->symlink(WP_DEPLOY_DIR . '/shared/config/sites', self::WP_ROOT_DIR . '/config/sites');
             $this->consoleExec($this->output, sprintf('%s >> %s', WP_DEPLOY_DIR . '/shared/config/sites', self::WP_ROOT_DIR . '/config/sites'));
         }
+
+        return WoodyCommand::SUCCESS;
     }
 }

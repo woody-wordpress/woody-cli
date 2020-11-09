@@ -150,6 +150,8 @@ class Core extends WoodyCommand
 
         $this->consoleH2($this->output, sprintf('Suppression du répertoire woody-core'));
         $fs->remove(self::WP_CORE_DIR);
+
+        return WoodyCommand::SUCCESS;
     }
 
     private function rmdir($dir, $inside_only = true)

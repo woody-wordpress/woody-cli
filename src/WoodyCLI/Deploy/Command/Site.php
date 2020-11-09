@@ -153,6 +153,8 @@ class Site extends WoodyCommand
                 $this->consoleH2($this->output, sprintf('Le projet "%s" n\'a jamais été déployé', $this->site_key));
             }
         }
+
+        return WoodyCommand::SUCCESS;
     }
 
     // Git clone

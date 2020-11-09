@@ -68,5 +68,7 @@ class Sites extends WoodyCommand
         $this->consoleH1($this->output, 'Finalisation du déploiement');
         $this->fs->remove(self::WP_CACHE_DIR . '/deploy.lock');
         $this->consoleList($this->output, 'Suppression du fichier deploy.lock');
+
+        return WoodyCommand::SUCCESS;
     }
 }

@@ -156,6 +156,8 @@ class Library extends WoodyCommand
             $this->consoleH2($this->output, sprintf('Suppression du répertoire woody-library'));
             $fs->remove(self::WP_LIBRARY_DIR_COPY);
         }
+
+        return WoodyCommand::SUCCESS;
     }
 
     private function removeProTemplates()

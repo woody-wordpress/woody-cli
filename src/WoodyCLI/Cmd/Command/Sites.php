@@ -66,5 +66,7 @@ class Sites extends WoodyCommand
             }
             $i++;
         }
+
+        return WoodyCommand::SUCCESS;
     }
 }
