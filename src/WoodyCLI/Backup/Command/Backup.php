@@ -150,8 +150,8 @@ class Backup extends WoodyCommand
         }
 
         // Create symlink release > latest
-        $cmd = sprintf('ln -s %s %s', $this->release_path, $this->latest_path);
+        $cmd = sprintf('ln -s %s %s', $this->version, 'latest');
         $this->consoleExec($this->output, $cmd);
-        $this->exec($cmd);
+        $this->execIn($this->path, $cmd);
     }
 }
