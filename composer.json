@@ -1,7 +1,7 @@
 {
     "name": "woody-wordpress/woody-cli",
     "type": "library",
-    "version": "1.12.2",
+    "version": "1.12.3",
     "description": "A PHP CLI interface to deploy Woody website",
     "license": "GPL-2.0",
     "authors": [

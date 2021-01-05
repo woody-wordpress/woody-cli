@@ -94,6 +94,12 @@ class Core extends WoodyCommand
         unset($composer['require']['woody-wordpress/advanced-custom-fields-pro']);
         unset($composer['require']['woody-wordpress/polylang-pro']);
 
+        foreach ($composer['require'] as $key => $val) {
+            if (strpos($key, 'woody-wordpress-pro/woody-addon') !== false) {
+                unset($composer['require'][$key]);
+            }
+        }
+
         $file = json_encode($composer, JSON_PRETTY_PRINT);
         $file = str_replace('\/', '/', $file);
         $file = str_replace('\u00e9', 'é', $file);
