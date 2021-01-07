@@ -120,6 +120,14 @@ class Backup extends WoodyCommand
         $cmd = sprintf('tar zcvf %s.tar.gz %s %s', $this->site_key_version, $this->site_key, $this->site_key_version . '.sql');
         $this->consoleExec($this->output, $cmd);
         $this->execIn($this->release_path, $cmd);
+
+        $cmd = sprintf('rm -rf %s', $this->site_key);
+        $this->consoleExec($this->output, $cmd);
+        $this->execIn($this->release_path, $cmd);
+
+        $cmd = sprintf('rm -rf %s', $this->site_key_version . '.sql');
+        $this->consoleExec($this->output, $cmd);
+        $this->execIn($this->release_path, $cmd);
     }
 
     private function backup_end()
