@@ -11,23 +11,19 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
 /**
- * Backup
+ * Transfer
  *
  * @author Léo POIROUX <leo@raccourci.fr>
  * @copyright (c) 2021, Raccourci Agency
  * @package woody-cli
  */
-class Backup extends WoodyCommand
+class Transfer extends WoodyCommand
 {
     protected $input;
     protected $output;
-    protected $is_exist;
-    protected $is_install;
-    protected $is_cloned;
-    protected $version;
-    protected $site_key_version;
     protected $path;
-    protected $release_path;
+    protected $from;
+    protected $version_path;
     protected $latest_path;
 
     /**
@@ -36,11 +32,13 @@ class Backup extends WoodyCommand
     public function configure()
     {
         $this
-            ->setName('backup:site')
-            ->setDescription('Sauvegarde un site')
+            ->setName('transfer:site')
+            ->setDescription('Transfert d\'un backup de site')
             // Options
             ->addOption('path', 'p', InputOption::VALUE_REQUIRED, 'Chemin de la sauvegarde')
+            ->addOption('timestamp', 't', InputOption::VALUE_REQUIRED, 'Timestamp version', 'latest')
             ->addOption('site', 's', InputOption::VALUE_REQUIRED, 'Site Key')
+            ->addOption('from', 'f', InputOption::VALUE_REQUIRED, 'From')
             ->addOption('env', 'e', InputOption::VALUE_OPTIONAL, 'Environnement', 'dev');
     }
 
@@ -54,8 +52,16 @@ class Backup extends WoodyCommand
 
         $this->setEnv($input->getOption('env'));
         $this->setSiteKey($input->getOption('site'));
-        $this->version = time();
-        $this->site_key_version = $this->site_key . '.' . $this->version;
+        $this->version = $input->getOption('timestamp');
+
+        // From
+        $from = $input->getOption('from');
+        if (empty($from)) {
+            $this->consoleH2($this->output, 'Le serveur source est non spécifié');
+            exit();
+        } else {
+            $this->from = $from;
+        }
 
         // Backup path
         $path = $input->getOption('path');
@@ -64,71 +70,36 @@ class Backup extends WoodyCommand
             exit();
         } else {
             $this->path = $path . '/' . $this->site_key;
-            $this->release_path = $this->path . '/' . $this->version;
             $this->latest_path = $this->path . '/latest';
+
+            // Get Real Version
+            if ($this->version == 'latest') {
+                $this->consoleH2($this->output, 'Trouver la véritable version');
+                $cmd = sprintf("ssh %s '%s'", $this->from, 'readlink -f ' . $this->latest_path);
+                $this->consoleExec($this->output, $cmd);
+                $version = $this->exec($cmd);
+                $version = explode('/', $version);
+                $version = end($version);
+                $this->version = $version;
+            }
+            $this->version_path = $this->path . '/' . $this->version;
         }
 
-        // Is Install
-        $this->is_exist = $this->fs->exists(sprintf(self::WP_SITE_DIR, $this->site_key));
-        $this->is_install = $this->fs->exists(sprintf(self::WP_SITE_UPLOADS_DIR . '/woody-cli.lock', $this->site_key));
-        $this->is_cloned = $this->fs->exists(sprintf(self::WP_SITE_DIR, $this->site_key) . '/style.css');
-
-        if ($this->is_exist && $this->is_install && $this->is_cloned) {
-            $this->backup_init();
-            $this->backup_uploads();
-            $this->backup_bdd();
-            $this->backup_gzip();
-            $this->backup_end();
-        } else {
-            $this->consoleH2($this->output, sprintf('Le projet "%s" n\'a jamais été déployé', $this->site_key));
-        }
+        $this->transfer_init();
+        $this->transfer_end();
 
         return WoodyCommand::SUCCESS;
     }
 
-    private function backup_init()
+    private function transfer_init()
     {
-        if (!$this->fs->exists($this->release_path)) {
-            $this->consoleH2($this->output, "Création du répertoire du sauvegarde");
-            $cmd = sprintf("mkdir -p %s", $this->release_path);
-            $this->consoleExec($this->output, $cmd);
-            $this->exec($cmd);
-        }
-    }
-
-    private function backup_uploads()
-    {
-        $this->consoleH2($this->output, 'Sauvegarde des images');
-        $cmd = sprintf("cp -r %s %s", sprintf(self::WP_SITE_UPLOADS_DIR, $this->site_key) . '/', $this->release_path);
+        $this->consoleH2($this->output, 'Transfer du backup');
+        $cmd = sprintf("rsync -ave ssh %s:%s/ %s/", $this->from, $this->version_path, $this->version_path);
         $this->consoleExec($this->output, $cmd);
         $this->exec($cmd);
     }
 
-    private function backup_bdd()
-    {
-        $this->consoleH2($this->output, 'Sauvegarde de la BDD');
-        $cmd = sprintf('db export %s/%s.sql', $this->release_path, $this->site_key_version);
-        $this->consoleExec($this->output, $cmd);
-        $this->wp($cmd);
-    }
-
-    private function backup_gzip()
-    {
-        $this->consoleH2($this->output, 'Compression du backup');
-        $cmd = sprintf('tar zcvf %s.tar.gz %s %s', $this->site_key_version, $this->site_key, $this->site_key_version . '.sql');
-        $this->consoleExec($this->output, $cmd);
-        $this->execIn($this->release_path, $cmd);
-
-        $cmd = sprintf('rm -rf %s', $this->site_key);
-        $this->consoleExec($this->output, $cmd);
-        $this->execIn($this->release_path, $cmd);
-
-        $cmd = sprintf('rm -rf %s', $this->site_key_version . '.sql');
-        $this->consoleExec($this->output, $cmd);
-        $this->execIn($this->release_path, $cmd);
-    }
-
-    private function backup_end()
+    private function transfer_end()
     {
         $this->consoleH2($this->output, 'Finalisation');
 

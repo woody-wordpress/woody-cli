@@ -14,7 +14,7 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
  * Restore
  *
  * @author Léo POIROUX <leo@raccourci.fr>
- * @copyright (c) 2017, Raccourci Agency
+ * @copyright (c) 2021, Raccourci Agency
  * @package woody-cli
  */
 class Restore extends WoodyCommand
@@ -22,13 +22,10 @@ class Restore extends WoodyCommand
     protected $input;
     protected $output;
     protected $is_exist;
-    protected $is_install;
     protected $is_cloned;
-    protected $site_config;
     protected $version;
     protected $path;
-    protected $release_path;
-    protected $latest_path;
+    protected $version_path;
 
     /**
      * {inheritdoc}
@@ -55,7 +52,6 @@ class Restore extends WoodyCommand
 
         $this->setEnv($input->getOption('env'));
         $this->setSiteKey($input->getOption('site'));
-        $this->site_config = $this->getSiteConfiguration();
         $this->version = $input->getOption('timestamp');
 
         // Backup path
@@ -64,9 +60,6 @@ class Restore extends WoodyCommand
             $this->consoleH2($this->output, 'Le chemin de sauvegarde est non spécifié');
             exit();
         } else {
-            if (empty($this->version)) {
-                $this->version = 'latest';
-            }
             $this->path = $path . '/' . $this->site_key;
             $this->version_path = $this->path . '/' . $this->version;
             if (!$this->fs->exists($this->version_path)) {
@@ -127,6 +120,10 @@ class Restore extends WoodyCommand
         $this->wp($cmd);
 
         $cmd = 'cli cache clear';
+        $this->consoleExec($this->output, $cmd);
+        $this->wp($cmd);
+
+        $cmd = 'cache flush';
         $this->consoleExec($this->output, $cmd);
         $this->wp($cmd);
     }
