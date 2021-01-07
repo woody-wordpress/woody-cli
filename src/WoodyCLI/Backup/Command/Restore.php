@@ -11,10 +11,10 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
 /**
- * Backup
+ * Restore
  *
  * @author Léo POIROUX <leo@raccourci.fr>
- * @copyright (c) 2017, Raccourci Agency
+ * @copyright (c) 2021, Raccourci Agency
  * @package woody-cli
  */
 class Restore extends WoodyCommand
@@ -22,14 +22,10 @@ class Restore extends WoodyCommand
     protected $input;
     protected $output;
     protected $is_exist;
-    protected $is_install;
     protected $is_cloned;
-    protected $site_config;
     protected $version;
-    protected $site_key_version;
     protected $path;
-    protected $release_path;
-    protected $latest_path;
+    protected $version_path;
 
     /**
      * {inheritdoc}
@@ -56,9 +52,7 @@ class Restore extends WoodyCommand
 
         $this->setEnv($input->getOption('env'));
         $this->setSiteKey($input->getOption('site'));
-        $this->site_config = $this->getSiteConfiguration();
         $this->version = $input->getOption('timestamp');
-        $this->site_key_version = $this->site_key . '.' . $this->version;
 
         // Backup path
         $path = $input->getOption('path');
@@ -78,13 +72,27 @@ class Restore extends WoodyCommand
         $this->is_cloned = $this->fs->exists(sprintf(self::WP_SITE_DIR, $this->site_key) . '/style.css');
 
         if ($this->is_exist && $this->is_cloned) {
+            $this->restore_ungzip();
             $this->restore_uploads();
             $this->restore_bdd();
+            $this->restore_end();
         } else {
             $this->consoleH2($this->output, sprintf('Le projet "%s" n\'a jamais été déployé', $this->site_key));
         }
 
         return WoodyCommand::SUCCESS;
+    }
+
+    private function restore_ungzip()
+    {
+        $this->consoleH2($this->output, 'Décompression du backup');
+        foreach (glob($this->version_path . "/*.tar.gz") as $filename) {
+            $dump_zip = $filename;
+            break;
+        }
+        $cmd = sprintf('tar xvzf %s', $dump_zip);
+        $this->consoleExec($this->output, $cmd);
+        $this->execIn($this->version_path, $cmd);
     }
 
     private function restore_uploads()
@@ -114,5 +122,26 @@ class Restore extends WoodyCommand
         $cmd = 'cli cache clear';
         $this->consoleExec($this->output, $cmd);
         $this->wp($cmd);
+
+        $cmd = 'cache flush';
+        $this->consoleExec($this->output, $cmd);
+        $this->wp($cmd);
+    }
+
+    private function restore_end()
+    {
+        $this->consoleH2($this->output, 'Finalisation');
+
+        $cmd = sprintf('rm -rf %s', $this->site_key);
+        $this->consoleExec($this->output, $cmd);
+        $this->execIn($this->version_path, $cmd);
+
+        foreach (glob($this->version_path . "/*.sql") as $filename) {
+            $dump_sql = $filename;
+            break;
+        }
+        $cmd = sprintf('rm -rf %s', $dump_sql);
+        $this->consoleExec($this->output, $cmd);
+        $this->execIn($this->version_path, $cmd);
     }
 }
