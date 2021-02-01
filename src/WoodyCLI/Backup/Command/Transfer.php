@@ -38,7 +38,7 @@ class Transfer extends WoodyCommand
             ->addOption('path', 'p', InputOption::VALUE_REQUIRED, 'Chemin de la sauvegarde')
             ->addOption('timestamp', 't', InputOption::VALUE_REQUIRED, 'Timestamp version', 'latest')
             ->addOption('site', 's', InputOption::VALUE_REQUIRED, 'Site Key')
-            ->addOption('from', 'f', InputOption::VALUE_REQUIRED, 'From')
+            ->addOption('from', 'f', InputOption::VALUE_REQUIRED, 'From (ex: admin@server)')
             ->addOption('env', 'e', InputOption::VALUE_OPTIONAL, 'Environnement', 'dev');
     }
 
@@ -86,6 +86,7 @@ class Transfer extends WoodyCommand
         }
 
         $this->transfer_init();
+        $this->transfer_rsync();
         $this->transfer_end();
 
         return WoodyCommand::SUCCESS;
@@ -93,8 +94,18 @@ class Transfer extends WoodyCommand
 
     private function transfer_init()
     {
+        if (!$this->fs->exists($this->version_path)) {
+            $this->consoleH2($this->output, "Création du répertoire du sauvegarde");
+            $cmd = sprintf("mkdir -p %s", $this->version_path);
+            $this->consoleExec($this->output, $cmd);
+            $this->exec($cmd);
+        }
+    }
+
+    private function transfer_rsync()
+    {
         $this->consoleH2($this->output, 'Transfer du backup');
-        $cmd = sprintf("rsync -ave ssh %s:%s/ %s/", $this->from, $this->version_path, $this->version_path);
+        $cmd = sprintf("rsync --progress -ave ssh %s:%s/ %s/", $this->from, $this->version_path, $this->version_path);
         $this->consoleExec($this->output, $cmd);
         $this->exec($cmd);
     }
