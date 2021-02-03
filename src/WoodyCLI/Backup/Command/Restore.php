@@ -119,13 +119,9 @@ class Restore extends WoodyCommand
         $this->consoleExec($this->output, $cmd);
         $this->wp($cmd);
 
-        $cmd = 'cli cache clear';
+        $cmd = sprintf('woody deploy:site -s %s -o %s', $this->site_key, 'no-install,no-updb,no-acf,no-gulp,no-warm,no-cdn');
         $this->consoleExec($this->output, $cmd);
-        $this->wp($cmd);
-
-        $cmd = 'cache flush';
-        $this->consoleExec($this->output, $cmd);
-        $this->wp($cmd);
+        $this->execIn(self::WP_ROOT_DIR, $cmd);
     }
 
     private function restore_end()

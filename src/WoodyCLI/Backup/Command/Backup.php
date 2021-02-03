@@ -98,6 +98,13 @@ class Backup extends WoodyCommand
 
     private function backup_uploads()
     {
+        if ($this->site_key == 'woody-sandbox') {
+            $this->consoleH2($this->output, 'Nettoyage des images');
+            $cmd = 'woody:reset_crops --force';
+            $this->consoleExec($this->output, $cmd);
+            $this->wp($cmd);
+        }
+
         $this->consoleH2($this->output, 'Sauvegarde des images');
         $cmd = sprintf("cp -r %s %s", sprintf(self::WP_SITE_UPLOADS_DIR, $this->site_key) . '/', $this->release_path);
         $this->consoleExec($this->output, $cmd);
