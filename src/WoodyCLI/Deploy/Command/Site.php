@@ -254,20 +254,6 @@ class Site extends WoodyCommand
         }
     }
 
-    // WP Maintenance ON
-    private function woody_maintenance_on()
-    {
-        $this->consoleH2($this->output, 'Mode maintenance ON');
-        $this->execIn(self::WP_CONFIG_DIRS . '/' . $this->site_key, "sed -i \"s/WOODY_MAINTENANCE='false'/WOODY_MAINTENANCE='true'/\" .env");
-    }
-
-    // WP Maintenance OFF
-    private function woody_maintenance_off()
-    {
-        $this->consoleH2($this->output, 'Mode maintenance OFF');
-        $this->execIn(self::WP_CONFIG_DIRS . '/' . $this->site_key, "sed -i \"s/WOODY_MAINTENANCE='true'/WOODY_MAINTENANCE='false'/\" .env");
-    }
-
     // WP Assets
     private function woody_assets()
     {

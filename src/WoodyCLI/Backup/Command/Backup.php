@@ -74,9 +74,11 @@ class Backup extends WoodyCommand
         $this->is_cloned = $this->fs->exists(sprintf(self::WP_SITE_DIR, $this->site_key) . '/style.css');
 
         if ($this->is_exist && $this->is_install && $this->is_cloned) {
+            $this->woody_maintenance_on();
             $this->backup_init();
             $this->backup_uploads();
             $this->backup_bdd();
+            $this->woody_maintenance_off();
             $this->backup_gzip();
             $this->backup_end();
         } else {
