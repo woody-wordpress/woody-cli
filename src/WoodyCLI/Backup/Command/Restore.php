@@ -73,8 +73,10 @@ class Restore extends WoodyCommand
 
         if ($this->is_exist && $this->is_cloned) {
             $this->restore_ungzip();
+            $this->woody_maintenance_on();
             $this->restore_uploads();
             $this->restore_bdd();
+            $this->woody_maintenance_off();
             $this->restore_end();
         } else {
             $this->consoleH2($this->output, sprintf('Le projet "%s" n\'a jamais été déployé', $this->site_key));
