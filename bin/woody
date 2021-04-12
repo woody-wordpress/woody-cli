@@ -81,7 +81,7 @@ if (is_file(VENDOR_DIR . '/autoload.php')) {
  */
 $app = new Application();
 $app->setName('Woody CLI');
-$app->setVersion('1.12.7');
+$app->setVersion('1.12.8');
 
 // Deploy commands
 $app->add(new Backup\Command\Backup());

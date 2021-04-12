@@ -103,6 +103,13 @@ class Restore extends WoodyCommand
         $cmd = sprintf("rsync --ignore-existing --del -avzO %s %s", $this->version_path . '/' . $this->site_key, sprintf(self::WP_SITE_UPLOADS_DIR, ''));
         $this->consoleExec($this->output, $cmd);
         $this->exec($cmd);
+
+        if ($this->site_key == 'woody-sandbox') {
+            $this->consoleH2($this->output, 'Nettoyage des images');
+            $cmd = 'woody:reset_crops --force';
+            $this->consoleExec($this->output, $cmd);
+            $this->wp($cmd);
+        }
     }
 
     private function restore_bdd()
@@ -121,7 +128,7 @@ class Restore extends WoodyCommand
         $this->consoleExec($this->output, $cmd);
         $this->wp($cmd);
 
-        $cmd = sprintf('woody deploy:site -s %s -o %s', $this->site_key, 'no-install,no-updb,no-acf,no-gulp,no-warm');
+        $cmd = sprintf('woody deploy:site -s %s', $this->site_key);
         $this->consoleExec($this->output, $cmd);
         $this->execIn(self::WP_ROOT_DIR, $cmd);
     }
