@@ -380,13 +380,13 @@ abstract class WoodyCommand extends AbstractCommand
     protected function woody_maintenance_on()
     {
         $this->consoleH2($this->output, 'Mode maintenance ON');
-        $this->execIn(self::WP_CONFIG_DIRS . '/' . $this->site_key, "sed -i \"s/WOODY_MAINTENANCE='false'/WOODY_MAINTENANCE='true'/\" .env");
+        $this->wp('woody_maintenance true');
     }
 
     // WP Maintenance OFF
     protected function woody_maintenance_off()
     {
         $this->consoleH2($this->output, 'Mode maintenance OFF');
-        $this->execIn(self::WP_CONFIG_DIRS . '/' . $this->site_key, "sed -i \"s/WOODY_MAINTENANCE='true'/WOODY_MAINTENANCE='false'/\" .env");
+        $this->wp('woody_maintenance false');
     }
 }
