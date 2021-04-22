@@ -20,22 +20,22 @@ abstract class WoodyCommand extends AbstractCommand
     /**
      * Path to core directory
      */
-    const WP_ROOT_DIR = WP_DEPLOY_DIR . '/current';
+    const WP_CURRENT_DIR = WP_ROOT_DIR . '/current';
 
     /**
-     * Path to core directory
+     * Path to gulp directory
      */
-    const WP_VENDOR_DIR = WP_ROOT_DIR . '/vendor';
+    const WP_GULP_DIR = self::WP_CURRENT_DIR . '/gulp';
 
     /**
      * Path to the configuration file of a site (with wildcard)
      */
-    const WP_CONFIG_DIRS = self::WP_ROOT_DIR . '/config/sites';
+    const WP_CONFIG_DIRS = self::WP_CURRENT_DIR . '/config/sites';
 
     /**
      * Path to site directory
      */
-    const WP_THEMES_DIR = self::WP_ROOT_DIR . '/web/app/themes';
+    const WP_THEMES_DIR = self::WP_CURRENT_DIR . '/web/app/themes';
 
     /**
      * Path to site directory
@@ -45,17 +45,17 @@ abstract class WoodyCommand extends AbstractCommand
     /**
      * Path to site directory
      */
-    const WP_SITE_UPLOADS_DIR = self::WP_ROOT_DIR . '/web/app/uploads/%s';
+    const WP_SITE_UPLOADS_DIR = self::WP_CURRENT_DIR . '/web/app/uploads/%s';
 
     /**
      * Path to site directory
      */
-    const WP_CACHE_DIR = self::WP_ROOT_DIR . '/web/app/cache';
+    const WP_CACHE_DIR = self::WP_CURRENT_DIR . '/web/app/cache';
 
     /**
      * Path to site directory
      */
-    const WP_DEPLOY_SITE_DIR = WP_DEPLOY_DIR . '/sites/%s/current';
+    const WP_DEPLOY_SITE_DIR = WP_ROOT_DIR . '/sites/%s/current';
 
     /**
      * Path to the cli commands
@@ -340,7 +340,7 @@ abstract class WoodyCommand extends AbstractCommand
     protected function wp($command, $exit_on_fail = true)
     {
         try {
-            $callback = $this->execIn(self::WP_ROOT_DIR, sprintf('WP_SITE_KEY=%s wp %s --allow-root', $this->site_key, $command));
+            $callback = $this->execIn(self::WP_CURRENT_DIR, sprintf('WP_SITE_KEY=%s wp %s --allow-root', $this->site_key, $command));
             return $callback;
         } catch (\Exception $e) {
             if ($exit_on_fail) {

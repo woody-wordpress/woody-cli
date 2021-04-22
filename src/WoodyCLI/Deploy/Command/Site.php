@@ -258,7 +258,7 @@ class Site extends WoodyCommand
     private function woody_assets()
     {
         $this->consoleH2($this->output, 'Compilation des Assets');
-        $this->execIn(self::WP_ROOT_DIR . '/gulp', 'yarn build --site ' . $this->site_key . ' --env ' . $this->env);
+        $this->execIn(self::WP_GULP_DIR, 'yarn build --site ' . $this->site_key . ' --env ' . $this->env);
     }
 
     // WP Cache Flush Core
