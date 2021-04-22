@@ -53,8 +53,8 @@ class Sites extends WoodyCommand
         $nb_sites = count($sites);
         foreach ($sites as $site_key => $site_config) {
             $this->consoleH2($this->output, sprintf('%s/%s %s', $i, $nb_sites, $site_key));
-            $this->consoleExec($this->output, sprintf('woody deploy:site -s %s -e %s -o %s,no-twig', $site_key, $env, $options));
-            $this->exec(sprintf('woody deploy:site -s %s -e %s -o %s,no-twig', $site_key, $env, $options));
+            $this->consoleExec($this->output, sprintf('woody deploy:site -s %s -e %s -o %s', $site_key, $env, $options));
+            $this->exec(sprintf('woody deploy:site -s %s -e %s -o %s', $site_key, $env, $options));
             $i++;
         }
 
