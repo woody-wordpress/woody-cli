@@ -46,7 +46,6 @@ class Core extends WoodyCommand
 
         $this->consoleH1($this->output, 'Installation du core Woody');
         $this->symlinks();
-        $this->flush_twig();
 
         return WoodyCommand::SUCCESS;
     }
@@ -64,13 +63,5 @@ class Core extends WoodyCommand
             $this->symlink(WP_DEPLOY_DIR . '/shared/config/sites', WP_ROOT_DIR . '/config/sites');
             $this->consoleExec($this->output, sprintf('%s >> %s', WP_DEPLOY_DIR . '/shared/config/sites', WP_ROOT_DIR . '/config/sites'));
         }
-    }
-
-    private function flush_twig()
-    {
-        $this->consoleH2($this->output, 'Suppression du cache Twig');
-        $cmd = sprintf('rm -rf %s/*', self::WP_TIMBER_DIR);
-        $this->exec($cmd);
-        $this->consoleExec($this->output, $cmd);
     }
 }
