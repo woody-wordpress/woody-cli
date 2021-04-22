@@ -130,7 +130,7 @@ class Restore extends WoodyCommand
 
         $cmd = sprintf('woody deploy:site -s %s', $this->site_key);
         $this->consoleExec($this->output, $cmd);
-        $this->execIn(self::WP_ROOT_DIR, $cmd);
+        $this->execIn($this->version_path, $cmd);
     }
 
     private function restore_end()
