@@ -87,7 +87,7 @@ class Site extends WoodyCommand
             $this->is_cloned = $this->fs->exists(sprintf(self::WP_SITE_DIR, $this->site_key) . '/style.css');
 
             if ($this->is_cloned) {
-                if (!in_array('no-install', $options) && !in_array('speed', $options)) {
+                if (!in_array('no-install', $options) && !in_array('speed', $options) && !in_array('multi-site', $options)) {
                     $this->woody_install();
                 }
 
@@ -95,7 +95,7 @@ class Site extends WoodyCommand
                     $this->woody_database_update();
                 }
 
-                if (!in_array('no-acf', $options) && !in_array('speed', $options)) {
+                if (!in_array('no-acf', $options) && !in_array('speed', $options) && !in_array('multi-site', $options)) {
                     $this->woody_acf_sync();
                 }
 
@@ -113,11 +113,11 @@ class Site extends WoodyCommand
                     $this->woody_flush_core();
                 }
 
-                if (!in_array('no-warm', $options) && !in_array('speed', $options)) {
+                if (!in_array('no-warm', $options) && !in_array('speed', $options) && !in_array('multi-site', $options)) {
                     $this->woody_cache_warm();
                 }
 
-                if (!in_array('no-twig', $options)) {
+                if (!in_array('no-twig', $options) && !in_array('multi-site', $options)) {
                     $this->woody_flush_twig();
                 }
 
@@ -131,7 +131,7 @@ class Site extends WoodyCommand
                     $this->woody_flush_cloudflare();
                 }
 
-                if (!in_array('no-sso', $options) && !in_array('speed', $options)) {
+                if (!in_array('no-sso', $options) && !in_array('speed', $options) && !in_array('multi-site', $options)) {
                     $this->woody_add_sso_domains();
                 }
             } else {
