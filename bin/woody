@@ -32,6 +32,7 @@ if (PHP_SAPI !== 'cli') {
 // Directories
 $vendorDir = dirname(dirname(dirname(dirname(__FILE__))));
 $vendorDir = preg_replace('/releases\\/[0-9]*/', 'current', $vendorDir);
+$vendorDir = str_replace('shared', 'current', $vendorDir);
 define('WP_VENDOR_DIR', $vendorDir);
 define('WP_ROOT_DIR', dirname(WP_VENDOR_DIR));
 define('WP_DEPLOY_DIR', dirname(WP_ROOT_DIR));
@@ -79,7 +80,7 @@ if (is_file(WP_VENDOR_DIR . '/autoload.php')) {
  */
 $app = new Application();
 $app->setName('Woody CLI');
-$app->setVersion('1.15.0');
+$app->setVersion('1.16.0');
 
 // Deploy commands
 $app->add(new Backup\Command\Backup());
