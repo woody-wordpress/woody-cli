@@ -45,7 +45,14 @@ class Core extends WoodyCommand
         $this->sites = $this->loadSites();
 
         $this->consoleH1($this->output, 'Installation du core Woody');
+        $this->symlinks();
+        $this->flush_twig();
 
+        return WoodyCommand::SUCCESS;
+    }
+
+    private function symlinks()
+    {
         if ($this->env != 'dev') {
             $this->consoleH2($this->output, 'Installation des symlinks de sites');
             foreach ($this->sites as $site_key => $site_val) {
@@ -54,10 +61,16 @@ class Core extends WoodyCommand
             }
         } else {
             $this->consoleH2($this->output, 'Installation du symlink de config');
-            $this->symlink(WP_ROOT_DIR . '/shared/config/sites', self::WP_CURRENT_DIR . '/config/sites');
-            $this->consoleExec($this->output, sprintf('%s >> %s', WP_ROOT_DIR . '/shared/config/sites', self::WP_CURRENT_DIR . '/config/sites'));
+            $this->symlink(WP_DEPLOY_DIR . '/shared/config/sites', WP_ROOT_DIR . '/config/sites');
+            $this->consoleExec($this->output, sprintf('%s >> %s', WP_DEPLOY_DIR . '/shared/config/sites', WP_ROOT_DIR . '/config/sites'));
         }
+    }
 
-        return WoodyCommand::SUCCESS;
+    private function flush_twig()
+    {
+        $this->consoleH2($this->output, 'Suppression du cache Twig');
+        $cmd = sprintf('rm -rf %s/*', self::WP_TIMBER_DIR);
+        $this->exec($cmd);
+        $this->consoleExec($this->output, $cmd);
     }
 }

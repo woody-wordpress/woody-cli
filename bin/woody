@@ -30,16 +30,11 @@ if (PHP_SAPI !== 'cli') {
 }
 
 // Directories
-$baseDir = dirname(dirname(__FILE__));
-$vendorDir = dirname(dirname($baseDir));
+$vendorDir = dirname(dirname(dirname(dirname(__FILE__))));
+$vendorDir = preg_replace('/releases\\/[0-9]*/', 'current', $vendorDir);
 define('WP_VENDOR_DIR', $vendorDir);
-if (strpos(WP_VENDOR_DIR, 'current') !== false) {
-    // /home/admin/www/wordpress/current
-    define('WP_ROOT_DIR', dirname(dirname(WP_VENDOR_DIR)));
-} else {
-    // /home/admin/www/wordpress/releases/20210422085746
-    define('WP_ROOT_DIR', dirname(dirname(dirname(WP_VENDOR_DIR))));
-}
+define('WP_ROOT_DIR', dirname(WP_VENDOR_DIR));
+define('WP_DEPLOY_DIR', dirname(WP_ROOT_DIR));
 
 // PHP Error
 error_reporting(-1);
@@ -84,7 +79,7 @@ if (is_file(WP_VENDOR_DIR . '/autoload.php')) {
  */
 $app = new Application();
 $app->setName('Woody CLI');
-$app->setVersion('1.14.0');
+$app->setVersion('1.15.0');
 
 // Deploy commands
 $app->add(new Backup\Command\Backup());
