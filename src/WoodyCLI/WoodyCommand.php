@@ -179,6 +179,9 @@ abstract class WoodyCommand extends AbstractCommand
             throw new \RuntimeException('Liste des sites vide');
         }
 
+        // Sorting by alphabetical order
+        ksort($sites);
+
         return $sites;
     }
 
