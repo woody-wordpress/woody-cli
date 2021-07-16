@@ -106,7 +106,7 @@ class Site extends WoodyCommand
                 }
 
                 if (!in_array('no-cache', $options)) {
-                    if (!in_array('no-cache-site', $options) && !in_array('speed', $options) && !in_array('multi-site', $options)) {
+                    if (!in_array('no-cache-site', $options)) {
                         $this->woody_flush_site();
                     }
 
