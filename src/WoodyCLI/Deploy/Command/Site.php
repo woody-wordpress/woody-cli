@@ -127,7 +127,7 @@ class Site extends WoodyCommand
                     $this->woody_flush_varnish();
                 }
 
-                if (!in_array('no-cdn', $options) && !in_array('speed', $options) && !in_array('multi-site', $options)) {
+                if (!in_array('no-cdn', $options) && !in_array('speed', $options)) {
                     $this->woody_flush_cloudflare();
                 }
 
