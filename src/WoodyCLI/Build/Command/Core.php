@@ -89,13 +89,10 @@ class Core extends WoodyCommand
         ];
 
         unset($composer['config']['github-oauth']);
-
-        unset($composer['require']['woody-wordpress-pro/woody-plugin']);
-        unset($composer['require']['woody-wordpress/advanced-custom-fields-pro']);
-        unset($composer['require']['woody-wordpress/polylang-pro']);
+        unset($composer['extra']['patches']);
 
         foreach ($composer['require'] as $key => $val) {
-            if (strpos($key, 'woody-wordpress-pro/woody-addon') !== false) {
+            if (strpos($key, 'woody-wordpress-pro') !== false) {
                 unset($composer['require'][$key]);
             }
         }
@@ -103,7 +100,6 @@ class Core extends WoodyCommand
         $file = json_encode($composer, JSON_PRETTY_PRINT);
         $file = str_replace('\/', '/', $file);
         $file = str_replace('\u00e9', 'é', $file);
-        $file = str_replace('woody-wordpress-pro', 'woody-wordpress', $file);
         file_put_contents(self::WP_CORE_DIR . '/composer.json', $file);
 
         $this->consoleH2($this->output, sprintf('Nettoyage du README.md'));
