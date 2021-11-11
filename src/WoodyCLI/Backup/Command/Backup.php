@@ -39,6 +39,7 @@ class Backup extends WoodyCommand
             ->setName('backup:site')
             ->setDescription('Sauvegarde un site')
             // Options
+            ->addOption('options', 'o', InputOption::VALUE_OPTIONAL, 'Options (no-upload,no-bdd)')
             ->addOption('path', 'p', InputOption::VALUE_REQUIRED, 'Chemin de la sauvegarde')
             ->addOption('site', 's', InputOption::VALUE_REQUIRED, 'Site Key')
             ->addOption('env', 'e', InputOption::VALUE_OPTIONAL, 'Environnement', 'dev');
@@ -51,6 +52,9 @@ class Backup extends WoodyCommand
     {
         $this->input = $input;
         $this->output = $output;
+
+        $options = $input->getOption('options');
+        $options = explode(',', $options);
 
         $this->setEnv($input->getOption('env'));
         $this->setSiteKey($input->getOption('site'));
@@ -76,8 +80,17 @@ class Backup extends WoodyCommand
         if ($this->is_exist && $this->is_install && $this->is_cloned) {
             $this->woody_maintenance_on();
             $this->backup_init();
-            $this->backup_uploads();
-            $this->backup_bdd();
+
+            // Disable backup Upload
+            if (!in_array('no-upload', $options)) {
+                $this->backup_uploads();
+            }
+
+            // Disable backup BDD
+            if (!in_array('no-bdd', $options)) {
+                $this->backup_bdd();
+            }
+
             $this->woody_maintenance_off();
             $this->backup_gzip();
             $this->backup_end();
@@ -100,6 +113,7 @@ class Backup extends WoodyCommand
 
     private function backup_uploads()
     {
+        // Disable backup Upload
         if ($this->site_key == 'woody-sandbox') {
             $this->consoleH2($this->output, 'Nettoyage des images');
             $cmd = 'woody:reset_crops --force';
@@ -124,17 +138,25 @@ class Backup extends WoodyCommand
     private function backup_gzip()
     {
         $this->consoleH2($this->output, 'Compression du backup');
-        $cmd = sprintf('tar zcvf %s.tar.gz %s %s', $this->site_key_version, $this->site_key, $this->site_key_version . '.sql');
-        $this->consoleExec($this->output, $cmd);
-        $this->execIn($this->release_path, $cmd);
+        $files = [];
+        if (file_exists($this->release_path . '/' . $this->site_key)) {
+            $files[] = $this->site_key;
+        }
+        if (file_exists($this->release_path . '/' . $this->site_key_version . '.sql')) {
+            $files[] = $this->site_key_version . '.sql';
+        }
 
-        $cmd = sprintf('rm -rf %s', $this->site_key);
-        $this->consoleExec($this->output, $cmd);
-        $this->execIn($this->release_path, $cmd);
+        if (!empty($files)) {
+            $cmd = sprintf('tar zcvf %s.tar.gz %s', $this->site_key_version, implode(' ', $files));
+            $this->consoleExec($this->output, $cmd);
+            $this->execIn($this->release_path, $cmd);
+        }
 
-        $cmd = sprintf('rm -rf %s', $this->site_key_version . '.sql');
-        $this->consoleExec($this->output, $cmd);
-        $this->execIn($this->release_path, $cmd);
+        foreach ($files as $file) {
+            $cmd = sprintf('rm -rf %s', $file);
+            $this->consoleExec($this->output, $cmd);
+            $this->execIn($this->release_path, $cmd);
+        }
     }
 
     private function backup_end()
