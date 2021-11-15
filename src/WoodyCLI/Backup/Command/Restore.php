@@ -100,15 +100,19 @@ class Restore extends WoodyCommand
     private function restore_uploads()
     {
         $this->consoleH2($this->output, 'Restauration des images');
-        $cmd = sprintf("rsync --ignore-existing --del -avzO %s %s", $this->version_path . '/' . $this->site_key, sprintf(self::WP_SITE_UPLOADS_DIR, ''));
-        $this->consoleExec($this->output, $cmd);
-        $this->exec($cmd);
-
-        if ($this->site_key == 'woody-sandbox') {
-            $this->consoleH2($this->output, 'Nettoyage des images');
-            $cmd = 'woody:reset_crops --force';
+        if (!file_exists($this->version_path . '/' . $this->site_key)) {
+            $this->consoleExec($this->output, 'Opération annulée : répertoire inexistant');
+        } else {
+            $cmd = sprintf("rsync --ignore-existing --del -avzO %s %s", $this->version_path . '/' . $this->site_key, sprintf(self::WP_SITE_UPLOADS_DIR, ''));
             $this->consoleExec($this->output, $cmd);
-            $this->wp($cmd);
+            $this->exec($cmd);
+
+            if ($this->site_key == 'woody-sandbox') {
+                $this->consoleH2($this->output, 'Nettoyage des images');
+                $cmd = 'woody:reset_crops --force';
+                $this->consoleExec($this->output, $cmd);
+                $this->wp($cmd);
+            }
         }
     }
 
@@ -120,17 +124,21 @@ class Restore extends WoodyCommand
             break;
         }
 
-        $cmd = 'db reset --yes';
-        $this->consoleExec($this->output, $cmd);
-        $this->wp($cmd);
+        if (!file_exists($dump_sql)) {
+            $this->consoleExec($this->output, 'Opération annulée : répertoire inexistant');
+        } else {
+            $cmd = 'db reset --yes';
+            $this->consoleExec($this->output, $cmd);
+            $this->wp($cmd);
 
-        $cmd = sprintf('db import %s', $dump_sql);
-        $this->consoleExec($this->output, $cmd);
-        $this->wp($cmd);
+            $cmd = sprintf('db import %s', $dump_sql);
+            $this->consoleExec($this->output, $cmd);
+            $this->wp($cmd);
 
-        $cmd = sprintf('woody deploy:site -s %s', $this->site_key);
-        $this->consoleExec($this->output, $cmd);
-        $this->execIn($this->version_path, $cmd);
+            $cmd = sprintf('woody deploy:site -s %s', $this->site_key);
+            $this->consoleExec($this->output, $cmd);
+            $this->execIn($this->version_path, $cmd);
+        }
     }
 
     private function restore_end()
