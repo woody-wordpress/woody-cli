@@ -42,11 +42,11 @@ class Core extends WoodyCommand
         $this->output = $output;
 
         $this->setEnv($input->getOption('env'));
-        $this->sites = $this->loadSites();
 
         $this->consoleH1($this->output, 'Installation du core Woody');
         $this->symlinks();
 
+        $this->sites = $this->loadSites();
         return WoodyCommand::SUCCESS;
     }
 
