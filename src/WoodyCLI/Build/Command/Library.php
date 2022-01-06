@@ -22,9 +22,9 @@ class Library extends WoodyCommand
     protected $input;
     protected $output;
 
-    const WP_LIBRARY_DIR = WP_VENDOR_DIR . '/woody-wordpress-pro/woody-library';
-    const WP_LIBRARY_DIR_COPY = WP_VENDOR_DIR . '/woody-wordpress/woody-library';
-    const WP_LIBRARY_DIR_COPY_GIT = WP_VENDOR_DIR . '/woody-wordpress/woody-library-git';
+    public const WP_LIBRARY_DIR = WP_VENDOR_DIR . '/woody-wordpress-pro/woody-library';
+    public const WP_LIBRARY_DIR_COPY = WP_VENDOR_DIR . '/woody-wordpress/woody-library';
+    public const WP_LIBRARY_DIR_COPY_GIT = WP_VENDOR_DIR . '/woody-wordpress/woody-library-git';
 
     /**
      * {inheritdoc}

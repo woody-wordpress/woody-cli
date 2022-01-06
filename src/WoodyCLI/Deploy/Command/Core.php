@@ -42,17 +42,16 @@ class Core extends WoodyCommand
         $this->output = $output;
 
         $this->setEnv($input->getOption('env'));
-
         $this->consoleH1($this->output, 'Installation du core Woody');
         $this->symlinks();
 
-        $this->sites = $this->loadSites();
         return WoodyCommand::SUCCESS;
     }
 
     private function symlinks()
     {
         if ($this->env != 'dev') {
+            $this->sites = $this->loadSites();
             $this->consoleH2($this->output, 'Installation des symlinks de sites');
             foreach ($this->sites as $site_key => $site_val) {
                 $this->symlink(sprintf(self::WP_DEPLOY_SITE_DIR, $site_key), sprintf(self::WP_SITE_DIR, $site_key));
@@ -60,8 +59,8 @@ class Core extends WoodyCommand
             }
         } else {
             $this->consoleH2($this->output, 'Installation du symlink de config');
-            $this->symlink(WP_DEPLOY_DIR . '/shared/config/sites', WP_ROOT_DIR . '/config/sites');
-            $this->consoleExec($this->output, sprintf('%s >> %s', WP_DEPLOY_DIR . '/shared/config/sites', WP_ROOT_DIR . '/config/sites'));
+            $this->symlink(WP_DEPLOY_DIR . '/shared/config/sites', parent::WP_CONFIG_DIRS);
+            $this->consoleExec($this->output, sprintf('%s >> %s', WP_DEPLOY_DIR . '/shared/config/sites', parent::WP_CONFIG_DIRS));
         }
     }
 }

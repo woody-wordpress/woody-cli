@@ -79,7 +79,7 @@ if (is_file(WP_VENDOR_DIR . '/autoload.php')) {
  */
 $app = new Application();
 $app->setName('Woody CLI');
-$app->setVersion('1.18.7');
+$app->setVersion('1.18.8');
 
 // Deploy commands
 $app->add(new Backup\Command\Backup());

@@ -20,47 +20,47 @@ abstract class WoodyCommand extends AbstractCommand
     /**
      * Path to gulp directory
      */
-    const WP_GULP_DIR = WP_ROOT_DIR . '/gulp';
+    public const WP_GULP_DIR = WP_ROOT_DIR . '/gulp';
 
     /**
      * Path to the configuration file of a site (with wildcard)
      */
-    const WP_CONFIG_DIRS = WP_ROOT_DIR . '/config/sites';
+    public const WP_CONFIG_DIRS = WP_ROOT_DIR . '/config/sites';
 
     /**
      * Path to site directory
      */
-    const WP_THEMES_DIR = WP_ROOT_DIR . '/web/app/themes';
+    public const WP_THEMES_DIR = WP_ROOT_DIR . '/web/app/themes';
 
     /**
      * Path to site directory
      */
-    const WP_SITE_DIR = self::WP_THEMES_DIR . '/%s';
+    public const WP_SITE_DIR = self::WP_THEMES_DIR . '/%s';
 
     /**
      * Path to site directory
      */
-    const WP_SITE_UPLOADS_DIR = WP_ROOT_DIR . '/web/app/uploads/%s';
+    public const WP_SITE_UPLOADS_DIR = WP_ROOT_DIR . '/web/app/uploads/%s';
 
     /**
      * Path to site directory
      */
-    const WP_CACHE_DIR = WP_ROOT_DIR . '/web/app/cache';
+    public const WP_CACHE_DIR = WP_ROOT_DIR . '/web/app/cache';
 
     /**
      * Path to twig cache directory
      */
-    const WP_TIMBER_DIR = self::WP_CACHE_DIR . '/timber';
+    public const WP_TIMBER_DIR = self::WP_CACHE_DIR . '/timber';
 
     /**
      * Path to site directory
      */
-    const WP_DEPLOY_SITE_DIR = WP_DEPLOY_DIR . '/sites/%s/current';
+    public const WP_DEPLOY_SITE_DIR = WP_DEPLOY_DIR . '/sites/%s/current';
 
     /**
      * Path to the cli commands
      */
-    const WP_SITE_CLI_DIR = self::WP_SITE_DIR . '/cli';
+    public const WP_SITE_CLI_DIR = self::WP_SITE_DIR . '/cli';
 
     /**
      * Loaded configuration
