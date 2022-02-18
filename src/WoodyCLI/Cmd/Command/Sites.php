@@ -32,6 +32,7 @@ class Sites extends WoodyCommand
             ->setDescription('Commande WP sur tous les sites')
             // Options
             ->addOption('wp', 'wp', InputOption::VALUE_OPTIONAL, 'Commande')
+            ->addOption('restart', 'restart', InputOption::VALUE_OPTIONAL, 'Restart with this site_key')
             ->addOption('env', 'e', InputOption::VALUE_OPTIONAL, 'Environnement', 'dev');
     }
 
@@ -45,9 +46,20 @@ class Sites extends WoodyCommand
 
         $wp = $input->getOption('wp');
         $env = $input->getOption('env');
-        $this->setEnv($env);
+        $restart = $input->getOption('restart');
 
+        $this->setEnv($env);
         $sites = $this->loadSites();
+
+        if (!empty($restart)) {
+            foreach ($sites as $site_key => $site_config) {
+                if ($site_key != $restart) {
+                    unset($sites[$site_key]);
+                } else {
+                    break;
+                }
+            }
+        }
 
         $this->consoleH1($this->output, 'Woody Command Multi-Site');
         $i = 1;
@@ -62,7 +74,7 @@ class Sites extends WoodyCommand
                 $this->consoleH1($this->output, sprintf('Projet "%s" fermé', $this->site_key));
             } else {
                 $this->consoleExec($this->output, sprintf('WP_SITE_KEY=%s wp %s', $site_key, $wp));
-                $this->exec(sprintf('WP_SITE_KEY=%s wp %s', $site_key, $wp));
+                $this->exec(sprintf('WP_SITE_KEY=%s wp %s', $site_key, $wp), 86400);
             }
             $i++;
         }
