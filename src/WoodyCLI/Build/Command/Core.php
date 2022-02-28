@@ -98,7 +98,6 @@ class Core extends WoodyCommand
         }
 
         unset($composer['require']['woody-wordpress/woody-sso']);
-        unset($composer['require']['woody-wordpress/woody-monitor']);
 
         $file = json_encode($composer, JSON_PRETTY_PRINT);
         $file = str_replace('\/', '/', $file);
