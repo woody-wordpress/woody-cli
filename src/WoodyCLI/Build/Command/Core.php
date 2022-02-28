@@ -97,10 +97,15 @@ class Core extends WoodyCommand
             }
         }
 
+        unset($composer['require']['woody-wordpress/woody-sso']);
+        unset($composer['require']['woody-wordpress/woody-monitor']);
+
         $file = json_encode($composer, JSON_PRETTY_PRINT);
         $file = str_replace('\/', '/', $file);
         $file = str_replace('\u00e9', 'é', $file);
         file_put_contents(self::WP_CORE_DIR . '/composer.json', $file);
+
+        $fs->remove(self::WP_CORE_DIR . '/composer.lock');
 
         $this->consoleH2($this->output, sprintf('Nettoyage du README.md'));
         $file = file_get_contents(self::WP_CORE_DIR . '/README.md');
