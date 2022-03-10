@@ -90,6 +90,7 @@ class Core extends WoodyCommand
 
         unset($composer['config']['github-oauth']);
         unset($composer['extra']['patches']);
+        unset($composer['scripts']['pre-update-cmd']);
 
         foreach ($composer['require'] as $key => $val) {
             if (strpos($key, 'woody-wordpress-pro') !== false) {
