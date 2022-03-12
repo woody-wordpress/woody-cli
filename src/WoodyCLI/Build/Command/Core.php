@@ -93,6 +93,7 @@ class Core extends WoodyCommand
         unset($composer['scripts']['pre-update-cmd']);
 
         $composer['require']['woody-wordpress/woody-library'] = $composer['require']['woody-wordpress-pro/woody-library'];
+        $composer['require']['woody-wordpress/woody-plugin'] = $composer['require']['woody-wordpress-pro/woody-plugin'];
 
         foreach ($composer['require'] as $key => $val) {
             if (strpos($key, 'woody-wordpress-pro') !== false) {
