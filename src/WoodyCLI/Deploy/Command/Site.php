@@ -123,15 +123,15 @@ class Site extends WoodyCommand
 
                 $this->woody_maintenance_off();
 
-                if (!in_array('no-varnish', $options) && !in_array('speed', $options)) {
+                if (!empty($this->site_config['WOODY_VARNISH_CACHING_ENABLE']) && !in_array('no-varnish', $options) && !in_array('speed', $options)) {
                     $this->woody_flush_varnish();
                 }
 
-                if (!in_array('no-cdn', $options) && !in_array('speed', $options)) {
+                if (!empty($this->site_config['WOODY_CLOUDFLARE_ENABLE']) && !in_array('no-cdn', $options) && !in_array('speed', $options)) {
                     $this->woody_flush_cloudflare();
                 }
 
-                if (!in_array('no-sso', $options) && !in_array('speed', $options) && !in_array('multi-site', $options)) {
+                if (!empty($this->site_config['WOODY_SSO_SECRET_URL']) && !in_array('no-sso', $options) && !in_array('speed', $options) && !in_array('multi-site', $options)) {
                     $this->woody_add_sso_domains();
                 }
             } else {
