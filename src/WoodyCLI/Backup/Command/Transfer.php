@@ -107,7 +107,7 @@ class Transfer extends WoodyCommand
         $this->consoleH2($this->output, 'Transfer du backup');
         $cmd = sprintf("rsync --progress -ave ssh %s:%s/ %s/", $this->from, $this->version_path, $this->version_path);
         $this->consoleExec($this->output, $cmd);
-        $this->exec($cmd);
+        $this->exec($cmd, 3600);
     }
 
     private function transfer_end()
