@@ -39,7 +39,7 @@ class Backup extends WoodyCommand
             ->setName('backup:site')
             ->setDescription('Sauvegarde un site')
             // Options
-            ->addOption('options', 'o', InputOption::VALUE_OPTIONAL, 'Options (no-upload,no-bdd)')
+            ->addOption('options', 'o', InputOption::VALUE_OPTIONAL, 'Options (no-upload,no-bdd,no-thumbs)')
             ->addOption('path', 'p', InputOption::VALUE_REQUIRED, 'Chemin de la sauvegarde')
             ->addOption('site', 's', InputOption::VALUE_REQUIRED, 'Site Key')
             ->addOption('env', 'e', InputOption::VALUE_OPTIONAL, 'Environnement', 'dev');
@@ -83,7 +83,7 @@ class Backup extends WoodyCommand
 
             // Disable backup Upload
             if (!in_array('no-upload', $options)) {
-                $this->backup_uploads();
+                $this->backup_uploads($options);
             }
 
             // Disable backup BDD
@@ -111,7 +111,7 @@ class Backup extends WoodyCommand
         }
     }
 
-    private function backup_uploads()
+    private function backup_uploads($options = [])
     {
         // Disable backup Upload
         if ($this->site_key == 'woody-sandbox') {
@@ -122,7 +122,11 @@ class Backup extends WoodyCommand
         }
 
         $this->consoleH2($this->output, 'Sauvegarde des images');
-        $cmd = sprintf("cp -r %s %s", sprintf(self::WP_SITE_UPLOADS_DIR, $this->site_key) . '/', $this->release_path);
+        if (in_array('no-thumbs', $options)) {
+            $cmd = sprintf("rsync -avz --exclude=thumbs %s %s", sprintf(self::WP_SITE_UPLOADS_DIR, $this->site_key), $this->release_path);
+        } else {
+            $cmd = sprintf("rsync -avz %s %s", sprintf(self::WP_SITE_UPLOADS_DIR, $this->site_key), $this->release_path);
+        }
         $this->consoleExec($this->output, $cmd);
         $this->exec($cmd);
     }
