@@ -36,6 +36,7 @@ class Restore extends WoodyCommand
             ->setName('restore:site')
             ->setDescription('Restaurer un site à partir d\'un backup')
             // Options
+            ->addOption('options', 'o', InputOption::VALUE_OPTIONAL, 'Options (no-thumbs)')
             ->addOption('path', 'p', InputOption::VALUE_REQUIRED, 'Chemin de la sauvegarde')
             ->addOption('timestamp', 't', InputOption::VALUE_REQUIRED, 'Timestamp version', 'latest')
             ->addOption('site', 's', InputOption::VALUE_REQUIRED, 'Site Key')
@@ -49,6 +50,9 @@ class Restore extends WoodyCommand
     {
         $this->input = $input;
         $this->output = $output;
+
+        $options = $input->getOption('options');
+        $options = explode(',', $options);
 
         $this->setEnv($input->getOption('env'));
         $this->setSiteKey($input->getOption('site'));
@@ -74,7 +78,7 @@ class Restore extends WoodyCommand
         if ($this->is_exist && $this->is_cloned) {
             $this->restore_ungzip();
             $this->woody_maintenance_on();
-            $this->restore_uploads();
+            $this->restore_uploads($options);
             $this->restore_bdd();
             $this->woody_maintenance_off();
             $this->restore_end();
@@ -97,7 +101,7 @@ class Restore extends WoodyCommand
         $this->execIn($this->version_path, $cmd);
     }
 
-    private function restore_uploads()
+    private function restore_uploads($options = [])
     {
         $this->consoleH2($this->output, 'Restauration des images');
         if (!file_exists($this->version_path . '/' . $this->site_key)) {
@@ -107,7 +111,7 @@ class Restore extends WoodyCommand
             $this->consoleExec($this->output, $cmd);
             $this->exec($cmd);
 
-            if ($this->site_key == 'woody-sandbox') {
+            if ($this->site_key == 'woody-sandbox' || in_array('no-thumbs', $options)) {
                 $this->consoleH2($this->output, 'Nettoyage des images');
                 $cmd = 'woody:reset_crops --force';
                 $this->consoleExec($this->output, $cmd);
