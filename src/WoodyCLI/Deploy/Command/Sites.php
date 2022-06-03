@@ -44,18 +44,20 @@ class Sites extends WoodyCommand
         $this->output = $output;
 
         $options = $input->getOption('options');
-        $env = $input->getOption('env');
-        $this->setEnv($env);
-        $sites = $this->loadSites();
+        if (strpos($options, 'multi-site') !== false) {
+            $env = $input->getOption('env');
+            $this->setEnv($env);
+            $sites = $this->loadSites();
 
-        $this->consoleH1($this->output, 'Woody Deploy Multi-Site');
-        $i = 1;
-        $nb_sites = count($sites);
-        foreach ($sites as $site_key => $site_config) {
-            $this->consoleH2($this->output, sprintf('%s/%s %s', $i, $nb_sites, $site_key));
-            $this->consoleExec($this->output, sprintf('woody deploy:site -s %s -e %s -o %s', $site_key, $env, $options));
-            $this->exec(sprintf('woody deploy:site -s %s -e %s -o %s', $site_key, $env, $options));
-            $i++;
+            $this->consoleH1($this->output, 'Woody Deploy Multi-Site');
+            $i = 1;
+            $nb_sites = count($sites);
+            foreach ($sites as $site_key => $site_config) {
+                $this->consoleH2($this->output, sprintf('%s/%s %s', $i, $nb_sites, $site_key));
+                $this->consoleExec($this->output, sprintf('woody deploy:site -s %s -e %s -o %s', $site_key, $env, $options));
+                $this->exec(sprintf('woody deploy:site -s %s -e %s -o %s', $site_key, $env, $options));
+                $i++;
+            }
         }
 
         return WoodyCommand::SUCCESS;

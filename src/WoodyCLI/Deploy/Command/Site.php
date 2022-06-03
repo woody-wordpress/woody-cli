@@ -103,8 +103,6 @@ class Site extends WoodyCommand
 
                 if (!in_array('no-gulp', $options) && !in_array('speed', $options)) {
                     $this->woody_assets();
-                } else {
-                    $this->woody_addons();
                 }
 
                 if (!in_array('no-cache', $options)) {
@@ -246,13 +244,6 @@ class Site extends WoodyCommand
     {
         $this->consoleH2($this->output, 'Compilation des Assets');
         $this->execIn(self::WP_GULP_DIR, 'yarn build --site ' . $this->site_key . ' --env ' . $this->env);
-    }
-
-    // WP Assets
-    private function woody_addons()
-    {
-        $this->consoleH2($this->output, 'Compilation des Addons');
-        $this->execIn(self::WP_GULP_DIR, 'yarn addons --site ' . $this->site_key . ' --env ' . $this->env);
     }
 
     // WP Cache Flush Core
