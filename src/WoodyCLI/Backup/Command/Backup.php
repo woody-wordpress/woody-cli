@@ -20,20 +20,29 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 class Backup extends WoodyCommand
 {
     protected $input;
+
     protected $output;
+
     protected $is_exist;
+
     protected $is_install;
+
     protected $is_cloned;
+
     protected $version;
+
     protected $site_key_version;
+
     protected $path;
+
     protected $release_path;
+
     protected $latest_path;
 
     /**
      * {inheritdoc}
      */
-    public function configure()
+    protected function configure()
     {
         $this
             ->setName('backup:site')
@@ -48,7 +57,7 @@ class Backup extends WoodyCommand
     /**
      * {inhertidoc}
      */
-    public function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->input = $input;
         $this->output = $output;
@@ -127,6 +136,7 @@ class Backup extends WoodyCommand
         } else {
             $cmd = sprintf("rsync -avz %s %s", sprintf(self::WP_SITE_UPLOADS_DIR, $this->site_key), $this->release_path);
         }
+
         $this->consoleExec($this->output, $cmd);
         $this->exec($cmd);
     }
@@ -146,6 +156,7 @@ class Backup extends WoodyCommand
         if (file_exists($this->release_path . '/' . $this->site_key)) {
             $files[] = $this->site_key;
         }
+
         if (file_exists($this->release_path . '/' . $this->site_key_version . '.sql')) {
             $files[] = $this->site_key_version . '.sql';
         }
@@ -177,6 +188,7 @@ class Backup extends WoodyCommand
         foreach (glob($this->path . "/*", GLOB_ONLYDIR) as $filename) {
             $releases[$filename] = $filename;
         }
+
         if (!empty($releases)) {
             krsort($releases);
             $keep_releases = array_slice($releases, 0, 3);

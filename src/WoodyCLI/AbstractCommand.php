@@ -142,8 +142,8 @@ abstract class AbstractCommand extends Command
         if (file_exists($config_path)) {
             try {
                 $return = Yaml::parseFile($config_path);
-            } catch (ParseException $e) {
-                throw new \RuntimeException(sprintf('Unable to parse the YAML string: %s', $e->getMessage()), $e->getCode(), $e);
+            } catch (ParseException $parseException) {
+                throw new \RuntimeException(sprintf('Unable to parse the YAML string: %s', $parseException->getMessage()), $parseException->getCode(), $parseException);
             }
         }
 

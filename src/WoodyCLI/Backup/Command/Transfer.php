@@ -20,21 +20,27 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 class Transfer extends WoodyCommand
 {
     protected $version;
+
     protected $input;
+
     protected $output;
+
     protected $path;
+
     protected $from;
+
     protected $version_path;
+
     protected $latest_path;
 
     /**
      * {inheritdoc}
      */
-    public function configure()
+    protected function configure()
     {
         $this
             ->setName('transfer:site')
-            ->setDescription('Transfert d\'un backup de site')
+            ->setDescription("Transfert d'un backup de site")
             // Options
             ->addOption('path', 'p', InputOption::VALUE_REQUIRED, 'Chemin de la sauvegarde')
             ->addOption('timestamp', 't', InputOption::VALUE_REQUIRED, 'Timestamp version', 'latest')
@@ -46,7 +52,7 @@ class Transfer extends WoodyCommand
     /**
      * {inhertidoc}
      */
-    public function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->input = $input;
         $this->output = $output;
@@ -83,6 +89,7 @@ class Transfer extends WoodyCommand
                 $version = end($version);
                 $this->version = $version;
             }
+
             $this->version_path = $this->path . '/' . $this->version;
         }
 
@@ -125,6 +132,7 @@ class Transfer extends WoodyCommand
         foreach (glob($this->path . "/*", GLOB_ONLYDIR) as $filename) {
             $releases[$filename] = $filename;
         }
+
         if (!empty($releases)) {
             krsort($releases);
             $keep_releases = array_slice($releases, 0, 3);

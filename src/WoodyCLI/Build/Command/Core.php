@@ -20,15 +20,23 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 class Core extends WoodyCommand
 {
     protected $input;
+
     protected $output;
 
+    /**
+     * @var string
+     */
     public const WP_CORE_DIR = '/tmp/woody-core';
+
+    /**
+     * @var string
+     */
     public const WP_CORE_DIR_COPY_GIT = '/tmp/woody-core-git';
 
     /**
      * {inheritdoc}
      */
-    public function configure()
+    protected function configure()
     {
         $this
             ->setName('build:core')
@@ -39,7 +47,7 @@ class Core extends WoodyCommand
     /**
      * {inhertidoc}
      */
-    public function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->input = $input;
         $this->output = $output;
@@ -63,16 +71,16 @@ class Core extends WoodyCommand
             $this->consoleH2($this->output, 'Nettoyage woody-core (dossier GIT temporaire)');
             try {
                 $fs->remove(self::WP_CORE_DIR_COPY_GIT);
-            } catch (IOExceptionInterface $exception) {
-                $this->consoleExec($this->output, "Erreur lors de la copie du répertoire " . $exception->getPath());
+            } catch (IOExceptionInterface $ioException) {
+                $this->consoleExec($this->output, "Erreur lors de la copie du répertoire " . $ioException->getPath());
             }
         }
 
         $this->consoleH2($this->output, 'Suppression du .git');
         try {
             $fs->remove(self::WP_CORE_DIR . '/.git');
-        } catch (IOExceptionInterface $exception) {
-            $this->consoleExec($this->output, "Erreur lors de la suppression du répertoire " . $exception->getPath());
+        } catch (IOExceptionInterface $ioException) {
+            $this->consoleExec($this->output, "Erreur lors de la suppression du répertoire " . $ioException->getPath());
         }
 
         $this->consoleH2($this->output, 'Nettoyage du composer.json');
@@ -135,26 +143,26 @@ class Core extends WoodyCommand
             $this->execIn(self::WP_CORE_DIR, 'git add .');
             $this->execIn(self::WP_CORE_DIR, 'git status');
             $this->execIn(self::WP_CORE_DIR, sprintf('git commit -am"Version %s - Updated from Woody-Core PRO"', $composer['version']));
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException $runtimeException) {
             //$this->consoleExec($this->output, $e->getMessage());
         }
 
         try {
             $this->execIn(self::WP_CORE_DIR, sprintf('git tag -d %s', $composer['version']));
             $this->execIn(self::WP_CORE_DIR, sprintf('git push --delete origin %s', $composer['version']));
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException $runtimeException) {
             //$this->consoleExec($this->output, $e->getMessage());
         }
 
         try {
             $this->execIn(self::WP_CORE_DIR, sprintf('git tag %s', $composer['version']));
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException $runtimeException) {
             //$this->consoleExec($this->output, $e->getMessage());
         }
 
         try {
             $this->execIn(self::WP_CORE_DIR, 'git push --set-upstream origin master --tags');
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException $runtimeException) {
             //$this->consoleExec($this->output, $e->getMessage());
         }
 

@@ -20,17 +20,23 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 class Lang extends WoodyCommand
 {
     protected $input;
+
     protected $output;
+
     protected $is_exist;
+
     protected $is_install;
+
     protected $is_cloned;
+
     protected $site_config;
+
     protected $site_dir;
 
     /**
      * {inheritdoc}
      */
-    public function configure()
+    protected function configure()
     {
         $this
             ->setName('cleaning:lang')
@@ -43,7 +49,7 @@ class Lang extends WoodyCommand
     /**
      * {inhertidoc}
      */
-    public function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->input = $input;
         $this->output = $output;
@@ -67,9 +73,11 @@ class Lang extends WoodyCommand
             if (in_array('roadbook', $this->site_config['WOODY_OPTIONS'])) {
                 $this->deleteRoadbookContents($lang, $sitekey);
             }
+
             if (in_array('deals', $this->site_config['WOODY_OPTIONS'])) {
                 $this->deleteDealsContents($lang, $sitekey);
             }
+
             if (in_array('topics', $this->site_config['WOODY_OPTIONS'])) {
                 $this->deleteTopicsContents($lang, $sitekey);
             }

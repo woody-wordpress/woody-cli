@@ -20,17 +20,23 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 class Site extends WoodyCommand
 {
     protected $input;
+
     protected $output;
+
     protected $is_exist;
+
     protected $is_install;
+
     protected $is_cloned;
+
     protected $site_config;
+
     protected $site_dir;
 
     /**
      * {inheritdoc}
      */
-    public function configure()
+    protected function configure()
     {
         $this
             ->setName('deploy:site')
@@ -44,7 +50,7 @@ class Site extends WoodyCommand
     /**
      * {inhertidoc}
      */
-    public function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->input = $input;
         $this->output = $output;
@@ -197,6 +203,7 @@ class Site extends WoodyCommand
                 if ($status == 'run') {
                     $this->wp($command, false);
                 }
+
                 $this->lock[] = $command;
             }
         }

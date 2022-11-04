@@ -20,21 +20,27 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 class Restore extends WoodyCommand
 {
     protected $input;
+
     protected $output;
+
     protected $is_exist;
+
     protected $is_cloned;
+
     protected $version;
+
     protected $path;
+
     protected $version_path;
 
     /**
      * {inheritdoc}
      */
-    public function configure()
+    protected function configure()
     {
         $this
             ->setName('restore:site')
-            ->setDescription('Restaurer un site à partir d\'un backup')
+            ->setDescription("Restaurer un site à partir d'un backup")
             // Options
             ->addOption('options', 'o', InputOption::VALUE_OPTIONAL, 'Options (no-thumbs)')
             ->addOption('path', 'p', InputOption::VALUE_REQUIRED, 'Chemin de la sauvegarde')
@@ -46,7 +52,7 @@ class Restore extends WoodyCommand
     /**
      * {inhertidoc}
      */
-    public function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->input = $input;
         $this->output = $output;
@@ -67,7 +73,7 @@ class Restore extends WoodyCommand
             $this->path = $path . '/' . $this->site_key;
             $this->version_path = $this->path . '/' . $this->version;
             if (!$this->fs->exists($this->version_path)) {
-                $this->consoleH2($this->output, 'Le chemin de sauvegarde n\'existe pas');
+                $this->consoleH2($this->output, "Le chemin de sauvegarde n'existe pas");
             }
         }
 

@@ -19,12 +19,13 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 class Core extends WoodyCommand
 {
     protected $input;
+
     protected $output;
 
     /**
      * {inheritdoc}
      */
-    public function configure()
+    protected function configure()
     {
         $this
             ->setName('deploy:core')
@@ -36,7 +37,7 @@ class Core extends WoodyCommand
     /**
      * {inhertidoc}
      */
-    public function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->input = $input;
         $this->output = $output;
