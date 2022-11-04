@@ -181,12 +181,10 @@ class Backup extends WoodyCommand
             krsort($releases);
             $keep_releases = array_slice($releases, 0, 3);
             $del_releases = array_diff($releases, $keep_releases);
-            if (!empty($del_releases)) {
-                foreach ($del_releases as $del_release) {
-                    $cmd = sprintf('rm -rf %s', $del_release);
-                    $this->consoleExec($this->output, $cmd);
-                    $this->exec($cmd);
-                }
+            foreach ($del_releases as $del_release) {
+                $cmd = sprintf('rm -rf %s', $del_release);
+                $this->consoleExec($this->output, $cmd);
+                $this->exec($cmd);
             }
         }
 

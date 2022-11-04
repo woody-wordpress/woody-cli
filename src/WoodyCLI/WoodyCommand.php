@@ -66,13 +66,13 @@ abstract class WoodyCommand extends AbstractCommand
      * Loaded configuration
      * @var array
      */
-    protected $sites = null;
+    protected $sites;
 
     /**
      * Current site Key
      * @var string
      */
-    protected $site_key = null;
+    protected $site_key;
 
     /**
      * Current env
@@ -349,7 +349,6 @@ abstract class WoodyCommand extends AbstractCommand
             if ($exit_on_fail) {
                 // Catch any error that might occure while clearing remote cache
                 throw new \RuntimeException('Error : ' . $e->getMessage());
-                exit(1);
             }
         }
     }

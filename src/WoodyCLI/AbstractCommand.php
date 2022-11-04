@@ -38,7 +38,7 @@ abstract class AbstractCommand extends Command
      * Buffer callback process function
      * @var callable|null
      */
-    protected $processBufferCallback = null;
+    protected $processBufferCallback;
 
     /**
      * __construct()
@@ -159,7 +159,6 @@ abstract class AbstractCommand extends Command
     {
         switch ($env) {
             case 'dev':
-                return 'develop';
             case 'integ':
                 return 'develop';
             case 'preprod':
