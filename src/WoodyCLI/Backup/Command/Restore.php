@@ -20,21 +20,27 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 class Restore extends WoodyCommand
 {
     protected $input;
+
     protected $output;
+
     protected $is_exist;
+
     protected $is_cloned;
+
     protected $version;
+
     protected $path;
+
     protected $version_path;
 
     /**
      * {inheritdoc}
      */
-    public function configure()
+    protected function configure()
     {
         $this
             ->setName('restore:site')
-            ->setDescription('Restaurer un site à partir d\'un backup')
+            ->setDescription("Restaurer un site à partir d'un backup")
             // Options
             ->addOption('options', 'o', InputOption::VALUE_OPTIONAL, 'Options (no-thumbs)')
             ->addOption('path', 'p', InputOption::VALUE_REQUIRED, 'Chemin de la sauvegarde')
@@ -46,7 +52,7 @@ class Restore extends WoodyCommand
     /**
      * {inhertidoc}
      */
-    public function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->input = $input;
         $this->output = $output;
@@ -67,7 +73,7 @@ class Restore extends WoodyCommand
             $this->path = $path . '/' . $this->site_key;
             $this->version_path = $this->path . '/' . $this->version;
             if (!$this->fs->exists($this->version_path)) {
-                $this->consoleH2($this->output, 'Le chemin de sauvegarde n\'existe pas');
+                $this->consoleH2($this->output, "Le chemin de sauvegarde n'existe pas");
             }
         }
 
@@ -78,8 +84,8 @@ class Restore extends WoodyCommand
         if ($this->is_exist && $this->is_cloned) {
             $this->restore_ungzip();
             $this->woody_maintenance_on();
-            $this->restore_uploads($options);
             $this->restore_bdd();
+            $this->restore_uploads($options);
             $this->woody_maintenance_off();
             $this->restore_end();
         } else {
@@ -91,11 +97,13 @@ class Restore extends WoodyCommand
 
     private function restore_ungzip()
     {
+        $dump_zip = null;
         $this->consoleH2($this->output, 'Décompression du backup');
         foreach (glob($this->version_path . "/*.tar.gz") as $filename) {
             $dump_zip = $filename;
             break;
         }
+
         $cmd = sprintf('tar xvzf %s', $dump_zip);
         $this->consoleExec($this->output, $cmd);
         $this->execIn($this->version_path, $cmd);
@@ -122,6 +130,7 @@ class Restore extends WoodyCommand
 
     private function restore_bdd()
     {
+        $dump_sql = null;
         $this->consoleH2($this->output, 'Restauration de la BDD');
         foreach (glob($this->version_path . "/*.sql") as $filename) {
             $dump_sql = $filename;
@@ -147,6 +156,7 @@ class Restore extends WoodyCommand
 
     private function restore_end()
     {
+        $dump_sql = null;
         $this->consoleH2($this->output, 'Finalisation');
 
         $cmd = sprintf('rm -rf %s', $this->site_key);
@@ -157,8 +167,11 @@ class Restore extends WoodyCommand
             $dump_sql = $filename;
             break;
         }
-        $cmd = sprintf('rm -rf %s', $dump_sql);
-        $this->consoleExec($this->output, $cmd);
-        $this->execIn($this->version_path, $cmd);
+
+        if (file_exists($dump_sql)) {
+            $cmd = sprintf('rm -rf %s', $dump_sql);
+            $this->consoleExec($this->output, $cmd);
+            $this->execIn($this->version_path, $cmd);
+        }
     }
 }

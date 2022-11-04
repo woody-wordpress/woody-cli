@@ -20,12 +20,13 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 class Sites extends WoodyCommand
 {
     protected $input;
+
     protected $output;
 
     /**
      * {inheritdoc}
      */
-    public function configure()
+    protected function configure()
     {
         $this
             ->setName('deploy:sites')
@@ -38,7 +39,7 @@ class Sites extends WoodyCommand
     /**
      * {inhertidoc}
      */
-    public function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->input = $input;
         $this->output = $output;
@@ -52,11 +53,11 @@ class Sites extends WoodyCommand
             $this->consoleH1($this->output, 'Woody Deploy Multi-Site');
             $i = 1;
             $nb_sites = count($sites);
-            foreach ($sites as $site_key => $site_config) {
+            foreach (array_keys($sites) as $site_key) {
                 $this->consoleH2($this->output, sprintf('%s/%s %s', $i, $nb_sites, $site_key));
                 $this->consoleExec($this->output, sprintf('woody deploy:site -s %s -e %s -o %s', $site_key, $env, $options));
                 $this->exec(sprintf('woody deploy:site -s %s -e %s -o %s', $site_key, $env, $options));
-                $i++;
+                ++$i;
             }
         }
 

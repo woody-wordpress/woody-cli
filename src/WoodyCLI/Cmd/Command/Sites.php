@@ -20,12 +20,13 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 class Sites extends WoodyCommand
 {
     protected $input;
+
     protected $output;
 
     /**
      * {inheritdoc}
      */
-    public function configure()
+    protected function configure()
     {
         $this
             ->setName('cmd:sites')
@@ -39,7 +40,7 @@ class Sites extends WoodyCommand
     /**
      * {inhertidoc}
      */
-    public function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->input = $input;
         $this->output = $output;
@@ -52,7 +53,7 @@ class Sites extends WoodyCommand
         $sites = $this->loadSites();
 
         if (!empty($restart)) {
-            foreach ($sites as $site_key => $site_config) {
+            foreach (array_keys($sites) as $site_key) {
                 if ($site_key != $restart) {
                     unset($sites[$site_key]);
                 } else {
@@ -76,7 +77,8 @@ class Sites extends WoodyCommand
                 $this->consoleExec($this->output, sprintf('WP_SITE_KEY=%s wp %s', $site_key, $wp));
                 $this->exec(sprintf('WP_SITE_KEY=%s wp %s', $site_key, $wp), 86400);
             }
-            $i++;
+
+            ++$i;
         }
 
         return WoodyCommand::SUCCESS;

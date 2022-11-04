@@ -38,7 +38,7 @@ abstract class AbstractCommand extends Command
      * Buffer callback process function
      * @var callable|null
      */
-    protected $processBufferCallback = null;
+    protected $processBufferCallback;
 
     /**
      * __construct()
@@ -96,15 +96,15 @@ abstract class AbstractCommand extends Command
         $process = new Process([]);
         $process = Process::fromShellCommandline($command);
         $process->setTimeout($timeout);
-        $process->run((true === $this->mute || $forcemute) ? null : $this->processBufferCallback);
+        $process->run(($this->mute || $forcemute) ? null : $this->processBufferCallback);
 
         if (!$process->isSuccessful()) {
             throw new \RuntimeException($process->getErrorOutput());
         }
 
-        $return = $process->getOutput();
+        $output = $process->getOutput();
 
-        return trim($return);
+        return trim($output);
     }
 
     /**
@@ -142,8 +142,8 @@ abstract class AbstractCommand extends Command
         if (file_exists($config_path)) {
             try {
                 $return = Yaml::parseFile($config_path);
-            } catch (ParseException $e) {
-                throw new \RuntimeException(sprintf('Unable to parse the YAML string: %s', $e->getMessage()));
+            } catch (ParseException $parseException) {
+                throw new \RuntimeException(sprintf('Unable to parse the YAML string: %s', $parseException->getMessage()), $parseException->getCode(), $parseException);
             }
         }
 
@@ -159,7 +159,6 @@ abstract class AbstractCommand extends Command
     {
         switch ($env) {
             case 'dev':
-                return 'develop';
             case 'integ':
                 return 'develop';
             case 'preprod':
@@ -196,11 +195,9 @@ abstract class AbstractCommand extends Command
     public function directoryIsEmpty($path)
     {
         $content = scandir($path);
-        $content = array_filter($content, function ($entry) {
-            return $entry !== '.' && $entry !== '..';
-        });
+        $content = array_filter($content, fn($entry) => $entry !== '.' && $entry !== '..');
 
-        return count($content) === 0;
+        return $content === [];
     }
 
     /**
@@ -225,17 +222,15 @@ abstract class AbstractCommand extends Command
      */
     protected function flattenArray($array)
     {
-        return is_array($array) ? array_reduce($array, function ($c, $a) {
-            return array_merge($c, $this->flattenArray($a));
-        }, []) : [$array];
+        return is_array($array) ? array_reduce($array, fn($c, $a) => array_merge($c, $this->flattenArray($a)), []) : [$array];
     }
 
     ////////////////////
 
     protected function consoleH1($output, $msg)
     {
-        $style = new OutputFormatterStyle('cyan', null, array('bold'));
-        $output->getFormatter()->setStyle('h1', $style);
+        $outputFormatterStyle = new OutputFormatterStyle('cyan', null, array('bold'));
+        $output->getFormatter()->setStyle('h1', $outputFormatterStyle);
 
         $output->writeln(sprintf('<h1>----------------------------------------------</>', $msg));
         $output->writeln(sprintf('<h1>%s</>', $msg));
@@ -244,15 +239,15 @@ abstract class AbstractCommand extends Command
 
     protected function consoleH2($output, $msg)
     {
-        $style = new OutputFormatterStyle('yellow', null, array());
-        $output->getFormatter()->setStyle('h2', $style);
+        $outputFormatterStyle = new OutputFormatterStyle('yellow', null, array());
+        $output->getFormatter()->setStyle('h2', $outputFormatterStyle);
         $output->writeln(sprintf('<h2>*** %s</>', mb_strtoupper($msg)));
     }
 
     protected function consoleList($output, $msg, $current = 0, $max = 0)
     {
-        $style = new OutputFormatterStyle('magenta', null, array());
-        $output->getFormatter()->setStyle('list', $style);
+        $outputFormatterStyle = new OutputFormatterStyle('magenta', null, array());
+        $output->getFormatter()->setStyle('list', $outputFormatterStyle);
 
         if (!empty($current) && !empty($max)) {
             $output->writeln(sprintf('<list># %s/%s %s</>', $current, $max, $msg));
@@ -263,8 +258,8 @@ abstract class AbstractCommand extends Command
 
     protected function consoleExec($output, $msg, $color = 'green')
     {
-        $style = new OutputFormatterStyle($color, null, array());
-        $output->getFormatter()->setStyle('cmd', $style);
+        $outputFormatterStyle = new OutputFormatterStyle($color, null, array());
+        $output->getFormatter()->setStyle('cmd', $outputFormatterStyle);
         $output->writeln(sprintf('<cmd>- %s</>', $msg));
     }
 

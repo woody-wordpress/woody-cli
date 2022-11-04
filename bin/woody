@@ -80,7 +80,7 @@ if (is_file(WP_VENDOR_DIR . '/autoload.php')) {
  */
 $app = new Application();
 $app->setName('Woody CLI');
-$app->setVersion('1.18.22');
+$app->setVersion('1.19.0');
 
 // Deploy commands
 $app->add(new Backup\Command\Backup());
@@ -100,6 +100,6 @@ $app->add(new Build\Command\Core());
 $app->add(new Cmd\Command\Sites());
 
 // Cleaning commands
-$app->add(new Cleaning\Command\Lang());
+// $app->add(new Cleaning\Command\Lang());
 
 $app->run();

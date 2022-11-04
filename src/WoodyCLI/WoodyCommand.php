@@ -17,48 +17,59 @@ use Symfony\Component\Yaml\Yaml;
  */
 abstract class WoodyCommand extends AbstractCommand
 {
+    protected $output;
+
     /**
      * Path to gulp directory
+     * @var string
      */
     public const WP_GULP_DIR = WP_ROOT_DIR . '/gulp';
 
     /**
      * Path to the configuration file of a site (with wildcard)
+     * @var string
      */
     public const WP_CONFIG_DIRS = WP_ROOT_DIR . '/config/sites';
 
     /**
      * Path to site directory
+     * @var string
      */
     public const WP_THEMES_DIR = WP_ROOT_DIR . '/web/app/themes';
 
     /**
      * Path to site directory
+     * @var string
      */
     public const WP_SITE_DIR = self::WP_THEMES_DIR . '/%s';
 
     /**
      * Path to site directory
+     * @var string
      */
     public const WP_SITE_UPLOADS_DIR = WP_ROOT_DIR . '/web/app/uploads/%s';
 
     /**
      * Path to site directory
+     * @var string
      */
     public const WP_CACHE_DIR = WP_ROOT_DIR . '/web/app/cache';
 
     /**
      * Path to twig cache directory
+     * @var string
      */
     public const WP_TIMBER_DIR = self::WP_CACHE_DIR . '/timber';
 
     /**
      * Path to site directory
+     * @var string
      */
     public const WP_DEPLOY_SITE_DIR = WP_DEPLOY_DIR . '/sites/%s/current';
 
     /**
      * Path to the cli commands
+     * @var string
      */
     public const WP_SITE_CLI_DIR = self::WP_SITE_DIR . '/cli';
 
@@ -66,13 +77,13 @@ abstract class WoodyCommand extends AbstractCommand
      * Loaded configuration
      * @var array
      */
-    protected $sites = null;
+    protected $sites = [];
 
     /**
      * Current site Key
      * @var string
      */
-    protected $site_key = null;
+    protected $site_key;
 
     /**
      * Current env
@@ -114,6 +125,7 @@ abstract class WoodyCommand extends AbstractCommand
         if (!$this->siteIsConfigured($site_key)) {
             throw new \RuntimeException(sprintf('Site "%s" inexistant dans la configuration', $site_key));
         }
+
         $this->site_key = $site_key;
     }
 
@@ -126,6 +138,7 @@ abstract class WoodyCommand extends AbstractCommand
         if (!$this->isValidEnv($env)) {
             throw new \RuntimeException(sprintf('Environnement "%s" invalide', $env));
         }
+
         $this->env = $env;
     }
 
@@ -170,7 +183,7 @@ abstract class WoodyCommand extends AbstractCommand
         $finder->files()->followLinks()->ignoreDotFiles(false)->in(self::WP_THEMES_DIR)->name('.env');
         foreach ($finder as $site) {
             $path = explode('/', $site->getRelativePath());
-            if (!empty($path[0]) && !empty($path[2]) && $path[2] == $this->env) {
+            if (!empty($path[0]) && !empty($path[2]) && $path[2] === $this->env) {
                 $sites[$path[0]] = array_merge($sites[$path[0]], $this->getDotEnv($site->getPathName()));
             }
         }
@@ -212,13 +225,11 @@ abstract class WoodyCommand extends AbstractCommand
 
             if (strpos($val, '[') !== false) {
                 $val = str_replace(array('[', ']', '"', ' '), '', $val);
-                $val = (!empty($val)) ? explode(',', $val) : [];
-            } else {
-                if (strpos($val, 'true') !== false) {
-                    $val = true;
-                } elseif (strpos($val, 'false') !== false) {
-                    $val = false;
-                }
+                $val = (empty($val)) ? [] : explode(',', $val);
+            } elseif (strpos($val, 'true') !== false) {
+                $val = true;
+            } elseif (strpos($val, 'false') !== false) {
+                $val = false;
             }
 
             $return[$key] = $val;
@@ -244,6 +255,7 @@ abstract class WoodyCommand extends AbstractCommand
                 if (empty($line)) {
                     continue;
                 }
+
                 $line = explode("=", $line);
                 $return[$line[0]] = $line[1];
             }
@@ -303,7 +315,8 @@ abstract class WoodyCommand extends AbstractCommand
             if (empty($envs)) {
                 continue;
             }
-            foreach ($envs as $env => $commands) {
+
+            foreach (array_keys($envs) as $env) {
                 if ($env != $this->env && $env != 'common') {
                     unset($config[$file][$env]);
                     continue;
@@ -325,6 +338,7 @@ abstract class WoodyCommand extends AbstractCommand
             if (empty($command)) {
                 continue;
             }
+
             if (in_array($command, $lock)) {
                 $return['lock'][] = $command;
             } else {
@@ -345,11 +359,10 @@ abstract class WoodyCommand extends AbstractCommand
         try {
             $callback = $this->execIn(WP_ROOT_DIR, sprintf('WP_SITE_KEY=%s wp %s --allow-root', $this->site_key, $command));
             return $callback;
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             if ($exit_on_fail) {
                 // Catch any error that might occure while clearing remote cache
-                throw new \RuntimeException('Error : ' . $e->getMessage());
-                exit(1);
+                throw new \RuntimeException('Error : ' . $exception->getMessage(), $exception->getCode(), $exception);
             }
         }
     }

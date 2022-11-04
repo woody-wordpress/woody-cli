@@ -19,12 +19,13 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 class Core extends WoodyCommand
 {
     protected $input;
+
     protected $output;
 
     /**
      * {inheritdoc}
      */
-    public function configure()
+    protected function configure()
     {
         $this
             ->setName('deploy:core')
@@ -36,7 +37,7 @@ class Core extends WoodyCommand
     /**
      * {inhertidoc}
      */
-    public function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->input = $input;
         $this->output = $output;
@@ -53,7 +54,7 @@ class Core extends WoodyCommand
         if ($this->env != 'dev') {
             $this->sites = $this->loadSites();
             $this->consoleH2($this->output, 'Installation des symlinks de sites');
-            foreach ($this->sites as $site_key => $site_val) {
+            foreach (array_keys($this->sites) as $site_key) {
                 $this->symlink(sprintf(self::WP_DEPLOY_SITE_DIR, $site_key), sprintf(self::WP_SITE_DIR, $site_key));
                 $this->consoleExec($this->output, sprintf($site_key . ' (%s)', sprintf(self::WP_SITE_DIR, $site_key)));
             }
