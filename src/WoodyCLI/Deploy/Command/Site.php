@@ -195,7 +195,7 @@ class Site extends WoodyCommand
             foreach ($commands as $command) {
                 $this->consoleExec($this->output, sprintf('[%s] %s', $status, $command));
                 if ($status == 'run') {
-                    $this->wp($command, false, true);
+                    $this->wp($command, false);
                 }
                 $this->lock[] = $command;
             }

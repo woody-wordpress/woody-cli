@@ -65,13 +65,13 @@ class Lang extends WoodyCommand
             $this->deleteContents($lang, $sitekey);
 
             if (in_array('roadbook', $this->site_config['WOODY_OPTIONS'])) {
-                $this->deleteRoadbookContents();
+                $this->deleteRoadbookContents($lang, $sitekey);
             }
             if (in_array('deals', $this->site_config['WOODY_OPTIONS'])) {
-                $this->deleteDealsContents();
+                $this->deleteDealsContents($lang, $sitekey);
             }
             if (in_array('topics', $this->site_config['WOODY_OPTIONS'])) {
-                $this->deleteTopicsContents();
+                $this->deleteTopicsContents($lang, $sitekey);
             }
         }
 
@@ -102,7 +102,7 @@ class Lang extends WoodyCommand
         $this->wp('term delete $(WP_SITE_KEY=' . $sitekey . ' wp term list topic_category --format=ids --lang="'. $lang .'")');
     }
 
-    public function deleteRoadbookContents()
+    public function deleteRoadbookContents($lang, $sitekey)
     {
         $this->consoleH2($this->output, 'Suppression des termes de taxonomies roadbook '  . $lang);
         $this->wp('term delete $(WP_SITE_KEY=' . $sitekey . ' wp term list themes --format=ids --lang="'. $lang .'")');
@@ -111,13 +111,13 @@ class Lang extends WoodyCommand
         $this->wp('post delete $(WP_SITE_KEY=' . $sitekey . ' wp post list --post_type=woody_rdbk_leaflets,woody_rdbk_feeds --format=ids --lang="'. $lang .'") --force');
     }
 
-    public function deleteDealsContents()
+    public function deleteDealsContents($lang, $sitekey)
     {
         $this->wp('post delete $(WP_SITE_KEY=' . $sitekey . ' wp post list --post_type=deal --format=ids --lang="'. $lang .'") --force');
         $this->wp('term delete $(WP_SITE_KEY=' . $sitekey . ' wp term list deals_category --format=ids --lang="'. $lang .'")');
     }
 
-    public function deleteTopicsContents()
+    public function deleteTopicsContents($lang, $sitekey)
     {
         $this->wp('post delete $(WP_SITE_KEY=' . $sitekey . ' wp post list --post_type=woody_topic --format=ids --lang="'. $lang .'") --force');
         $this->wp('term delete $(WP_SITE_KEY=' . $sitekey . ' wp term list topic_category --format=ids --lang="'. $lang .'")');

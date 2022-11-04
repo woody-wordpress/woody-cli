@@ -79,7 +79,7 @@ class Core extends WoodyCommand
         $file = file_get_contents(self::WP_CORE_DIR . '/composer.json');
 
         // Extract composer
-        $composer = json_decode($file, true);
+        $composer = json_decode($file, true, 512, JSON_THROW_ON_ERROR);
 
         // Remove repositories
         $composer['repositories'] = [];

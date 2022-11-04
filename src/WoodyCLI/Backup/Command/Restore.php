@@ -91,11 +91,13 @@ class Restore extends WoodyCommand
 
     private function restore_ungzip()
     {
+        $dump_zip = null;
         $this->consoleH2($this->output, 'Décompression du backup');
         foreach (glob($this->version_path . "/*.tar.gz") as $filename) {
             $dump_zip = $filename;
             break;
         }
+
         $cmd = sprintf('tar xvzf %s', $dump_zip);
         $this->consoleExec($this->output, $cmd);
         $this->execIn($this->version_path, $cmd);
@@ -122,6 +124,7 @@ class Restore extends WoodyCommand
 
     private function restore_bdd()
     {
+        $dump_sql = null;
         $this->consoleH2($this->output, 'Restauration de la BDD');
         foreach (glob($this->version_path . "/*.sql") as $filename) {
             $dump_sql = $filename;
@@ -147,6 +150,7 @@ class Restore extends WoodyCommand
 
     private function restore_end()
     {
+        $dump_sql = null;
         $this->consoleH2($this->output, 'Finalisation');
 
         $cmd = sprintf('rm -rf %s', $this->site_key);
@@ -157,8 +161,11 @@ class Restore extends WoodyCommand
             $dump_sql = $filename;
             break;
         }
-        $cmd = sprintf('rm -rf %s', $dump_sql);
-        $this->consoleExec($this->output, $cmd);
-        $this->execIn($this->version_path, $cmd);
+
+        if (file_exists($dump_sql)) {
+            $cmd = sprintf('rm -rf %s', $dump_sql);
+            $this->consoleExec($this->output, $cmd);
+            $this->execIn($this->version_path, $cmd);
+        }
     }
 }

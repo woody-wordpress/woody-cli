@@ -79,7 +79,7 @@ class Library extends WoodyCommand
         $file = file_get_contents(self::WP_LIBRARY_DIR . '/composer.json');
 
         // Extract composer
-        $composer = json_decode($file, true);
+        $composer = json_decode($file, true, 512, JSON_THROW_ON_ERROR);
 
         $this->consoleH2($this->output, sprintf('Nettoyage du README.md'));
         $file = file_get_contents(self::WP_LIBRARY_DIR . '/README.md');
@@ -153,7 +153,7 @@ class Library extends WoodyCommand
         if ($finder->hasResults()) {
             foreach ($finder as $file) {
                 $pathinfo = pathinfo($file->getRelativePathname());
-                $json = json_decode(file_get_contents($file->getRealPath()), true);
+                $json = json_decode(file_get_contents($file->getRealPath()), true, 512, JSON_THROW_ON_ERROR);
                 if (!empty($json['lib_type']) && $json['lib_type'] == 'pro') {
                     $this->consoleExec($this->output, sprintf('PRO : %s', $pathinfo['dirname']), 'red');
                     $dirname = str_replace('/' . $pathinfo['basename'], '', $file->getRealPath());

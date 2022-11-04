@@ -196,9 +196,7 @@ abstract class AbstractCommand extends Command
     public function directoryIsEmpty($path)
     {
         $content = scandir($path);
-        $content = array_filter($content, function ($entry) {
-            return $entry !== '.' && $entry !== '..';
-        });
+        $content = array_filter($content, fn($entry) => $entry !== '.' && $entry !== '..');
 
         return count($content) === 0;
     }
@@ -225,9 +223,7 @@ abstract class AbstractCommand extends Command
      */
     protected function flattenArray($array)
     {
-        return is_array($array) ? array_reduce($array, function ($c, $a) {
-            return array_merge($c, $this->flattenArray($a));
-        }, []) : [$array];
+        return is_array($array) ? array_reduce($array, fn($c, $a) => array_merge($c, $this->flattenArray($a)), []) : [$array];
     }
 
     ////////////////////
