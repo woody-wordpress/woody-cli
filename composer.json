@@ -1,7 +1,7 @@
 {
     "name": "woody-wordpress/woody-cli",
     "type": "library",
-    "version": "1.18.22",
+    "version": "1.18.23",
     "description": "A PHP CLI interface to deploy Woody website",
     "license": "GPL-2.0",
     "authors": [
@@ -11,7 +11,7 @@
         }
     ],
     "require": {
-        "php": "^7.3",
+        "php": "^7.3|^8.0",
         "symfony/console": "^5.1",
         "symfony/process": "^5.1",
         "symfony/yaml": "^5.1",

@@ -78,8 +78,8 @@ class Restore extends WoodyCommand
         if ($this->is_exist && $this->is_cloned) {
             $this->restore_ungzip();
             $this->woody_maintenance_on();
-            $this->restore_uploads($options);
             $this->restore_bdd();
+            $this->restore_uploads($options);
             $this->woody_maintenance_off();
             $this->restore_end();
         } else {
