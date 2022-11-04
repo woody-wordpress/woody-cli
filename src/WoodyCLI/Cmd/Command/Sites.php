@@ -52,7 +52,7 @@ class Sites extends WoodyCommand
         $sites = $this->loadSites();
 
         if (!empty($restart)) {
-            foreach ($sites as $site_key => $site_config) {
+            foreach (array_keys($sites) as $site_key) {
                 if ($site_key != $restart) {
                     unset($sites[$site_key]);
                 } else {

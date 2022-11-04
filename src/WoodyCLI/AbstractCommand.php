@@ -96,7 +96,7 @@ abstract class AbstractCommand extends Command
         $process = new Process([]);
         $process = Process::fromShellCommandline($command);
         $process->setTimeout($timeout);
-        $process->run((true === $this->mute || $forcemute) ? null : $this->processBufferCallback);
+        $process->run(($this->mute || $forcemute) ? null : $this->processBufferCallback);
 
         if (!$process->isSuccessful()) {
             throw new \RuntimeException($process->getErrorOutput());
@@ -143,7 +143,7 @@ abstract class AbstractCommand extends Command
             try {
                 $return = Yaml::parseFile($config_path);
             } catch (ParseException $e) {
-                throw new \RuntimeException(sprintf('Unable to parse the YAML string: %s', $e->getMessage()));
+                throw new \RuntimeException(sprintf('Unable to parse the YAML string: %s', $e->getMessage()), $e->getCode(), $e);
             }
         }
 
@@ -197,7 +197,7 @@ abstract class AbstractCommand extends Command
         $content = scandir($path);
         $content = array_filter($content, fn($entry) => $entry !== '.' && $entry !== '..');
 
-        return count($content) === 0;
+        return $content === [];
     }
 
     /**

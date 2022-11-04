@@ -19,6 +19,7 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
  */
 class Transfer extends WoodyCommand
 {
+    protected $version;
     protected $input;
     protected $output;
     protected $path;

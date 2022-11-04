@@ -60,7 +60,7 @@ class Library extends WoodyCommand
         }
 
         if (file_exists(self::WP_LIBRARY_DIR_COPY_GIT)) {
-            $this->consoleH2($this->output, sprintf('Nettoyage woody-library (dossier GIT temporaire)'));
+            $this->consoleH2($this->output, 'Nettoyage woody-library (dossier GIT temporaire)');
             try {
                 $fs->remove(self::WP_LIBRARY_DIR_COPY_GIT);
             } catch (IOExceptionInterface $exception) {
@@ -68,36 +68,36 @@ class Library extends WoodyCommand
             }
         }
 
-        $this->consoleH2($this->output, sprintf('Suppression du .git'));
+        $this->consoleH2($this->output, 'Suppression du .git');
         try {
             $fs->remove(self::WP_LIBRARY_DIR . '/.git');
         } catch (IOExceptionInterface $exception) {
             $this->consoleExec($this->output, "Erreur lors de la suppression du répertoire " . $exception->getPath());
         }
 
-        $this->consoleH2($this->output, sprintf('Nettoyage du composer.json'));
+        $this->consoleH2($this->output, 'Nettoyage du composer.json');
         $file = file_get_contents(self::WP_LIBRARY_DIR . '/composer.json');
 
         // Extract composer
         $composer = json_decode($file, true, 512, JSON_THROW_ON_ERROR);
 
-        $this->consoleH2($this->output, sprintf('Nettoyage du README.md'));
+        $this->consoleH2($this->output, 'Nettoyage du README.md');
         $file = file_get_contents(self::WP_LIBRARY_DIR . '/README.md');
         $file = str_replace('woody-wordpress-pro', 'woody-wordpress', $file);
         file_put_contents(self::WP_LIBRARY_DIR . '/README.md', $file);
 
-        $this->consoleH2($this->output, sprintf('Nettoyage du WoodyLibrary.php'));
+        $this->consoleH2($this->output, 'Nettoyage du WoodyLibrary.php');
         $file = file_get_contents(self::WP_LIBRARY_DIR . '/WoodyLibrary.php');
         $file = str_replace('woody-wordpress-pro', 'woody-wordpress', $file);
         file_put_contents(self::WP_LIBRARY_DIR . '/WoodyLibrary.php', $file);
 
-        $this->consoleH2($this->output, sprintf('Suppression des templates PRO'));
+        $this->consoleH2($this->output, 'Suppression des templates PRO');
         $this->removeProTemplates();
 
-        $this->consoleH2($this->output, sprintf('Suppression de pro_vs_lite'));
+        $this->consoleH2($this->output, 'Suppression de pro_vs_lite');
         $fs->remove(self::WP_LIBRARY_DIR . '/pro_vs_lite');
 
-        $this->consoleH2($this->output, sprintf('Initialisation repository GIT'));
+        $this->consoleH2($this->output, 'Initialisation repository GIT');
         $fs->mkdir(self::WP_LIBRARY_DIR_COPY_GIT);
         $this->execIn(self::WP_LIBRARY_DIR_COPY_GIT, 'git init');
         $this->execIn(self::WP_LIBRARY_DIR_COPY_GIT, 'git remote add origin git@github.com:woody-wordpress/woody-library.git');
@@ -106,13 +106,13 @@ class Library extends WoodyCommand
         $this->execIn(self::WP_LIBRARY_DIR_COPY_GIT, 'git config --local user.email "support@woody-wordpress.com"');
         $this->execIn(self::WP_LIBRARY_DIR_COPY_GIT, 'git config --local user.name "Woody Wordpress"');
 
-        $this->consoleH2($this->output, sprintf('Ajout du repository GIT'));
+        $this->consoleH2($this->output, 'Ajout du repository GIT');
         $fs->mirror(self::WP_LIBRARY_DIR_COPY_GIT . '/.git', self::WP_LIBRARY_DIR . '/.git');
 
-        $this->consoleH2($this->output, sprintf('Suppression du repository GIT'));
+        $this->consoleH2($this->output, 'Suppression du repository GIT');
         $fs->remove(self::WP_LIBRARY_DIR_COPY_GIT);
 
-        $this->consoleH2($this->output, sprintf('Création du commit'));
+        $this->consoleH2($this->output, 'Création du commit');
         try {
             $this->execIn(self::WP_LIBRARY_DIR, 'git add .');
             $this->execIn(self::WP_LIBRARY_DIR, 'git status');
@@ -140,7 +140,7 @@ class Library extends WoodyCommand
             //$this->consoleExec($this->output, $e->getMessage());
         }
 
-        $this->consoleH2($this->output, sprintf('Suppression du répertoire woody-library'));
+        $this->consoleH2($this->output, 'Suppression du répertoire woody-library');
         $fs->remove(self::WP_LIBRARY_DIR);
 
         return WoodyCommand::SUCCESS;

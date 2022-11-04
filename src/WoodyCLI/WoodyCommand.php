@@ -17,6 +17,8 @@ use Symfony\Component\Yaml\Yaml;
  */
 abstract class WoodyCommand extends AbstractCommand
 {
+    protected $output;
+
     /**
      * Path to gulp directory
      */
@@ -170,7 +172,7 @@ abstract class WoodyCommand extends AbstractCommand
         $finder->files()->followLinks()->ignoreDotFiles(false)->in(self::WP_THEMES_DIR)->name('.env');
         foreach ($finder as $site) {
             $path = explode('/', $site->getRelativePath());
-            if (!empty($path[0]) && !empty($path[2]) && $path[2] == $this->env) {
+            if (!empty($path[0]) && !empty($path[2]) && $path[2] === $this->env) {
                 $sites[$path[0]] = array_merge($sites[$path[0]], $this->getDotEnv($site->getPathName()));
             }
         }
@@ -212,13 +214,11 @@ abstract class WoodyCommand extends AbstractCommand
 
             if (strpos($val, '[') !== false) {
                 $val = str_replace(array('[', ']', '"', ' '), '', $val);
-                $val = (!empty($val)) ? explode(',', $val) : [];
-            } else {
-                if (strpos($val, 'true') !== false) {
-                    $val = true;
-                } elseif (strpos($val, 'false') !== false) {
-                    $val = false;
-                }
+                $val = (empty($val)) ? [] : explode(',', $val);
+            } elseif (strpos($val, 'true') !== false) {
+                $val = true;
+            } elseif (strpos($val, 'false') !== false) {
+                $val = false;
             }
 
             $return[$key] = $val;
@@ -303,7 +303,7 @@ abstract class WoodyCommand extends AbstractCommand
             if (empty($envs)) {
                 continue;
             }
-            foreach ($envs as $env => $commands) {
+            foreach (array_keys($envs) as $env) {
                 if ($env != $this->env && $env != 'common') {
                     unset($config[$file][$env]);
                     continue;
@@ -348,7 +348,7 @@ abstract class WoodyCommand extends AbstractCommand
         } catch (\Exception $e) {
             if ($exit_on_fail) {
                 // Catch any error that might occure while clearing remote cache
-                throw new \RuntimeException('Error : ' . $e->getMessage());
+                throw new \RuntimeException('Error : ' . $e->getMessage(), $e->getCode(), $e);
             }
         }
     }
