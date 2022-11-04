@@ -52,12 +52,12 @@ class Library extends WoodyCommand
         $this->input = $input;
         $this->output = $output;
 
-        $fs = new Filesystem();
+        $filesystem = new Filesystem();
 
         $this->consoleH1($this->output, 'Build de la version LITE de la Library');
 
         if (file_exists(self::WP_LIBRARY_DIR)) {
-            $fs->remove(self::WP_LIBRARY_DIR);
+            $filesystem->remove(self::WP_LIBRARY_DIR);
         }
 
         $this->exec('git clone git@github.com:woody-wordpress-pro/woody-library.git ' . self::WP_LIBRARY_DIR);
@@ -70,7 +70,7 @@ class Library extends WoodyCommand
         if (file_exists(self::WP_LIBRARY_DIR_COPY_GIT)) {
             $this->consoleH2($this->output, 'Nettoyage woody-library (dossier GIT temporaire)');
             try {
-                $fs->remove(self::WP_LIBRARY_DIR_COPY_GIT);
+                $filesystem->remove(self::WP_LIBRARY_DIR_COPY_GIT);
             } catch (IOExceptionInterface $ioException) {
                 $this->consoleExec($this->output, "Erreur lors de la copie du répertoire " . $ioException->getPath());
             }
@@ -78,7 +78,7 @@ class Library extends WoodyCommand
 
         $this->consoleH2($this->output, 'Suppression du .git');
         try {
-            $fs->remove(self::WP_LIBRARY_DIR . '/.git');
+            $filesystem->remove(self::WP_LIBRARY_DIR . '/.git');
         } catch (IOExceptionInterface $ioException) {
             $this->consoleExec($this->output, "Erreur lors de la suppression du répertoire " . $ioException->getPath());
         }
@@ -103,10 +103,10 @@ class Library extends WoodyCommand
         $this->removeProTemplates();
 
         $this->consoleH2($this->output, 'Suppression de pro_vs_lite');
-        $fs->remove(self::WP_LIBRARY_DIR . '/pro_vs_lite');
+        $filesystem->remove(self::WP_LIBRARY_DIR . '/pro_vs_lite');
 
         $this->consoleH2($this->output, 'Initialisation repository GIT');
-        $fs->mkdir(self::WP_LIBRARY_DIR_COPY_GIT);
+        $filesystem->mkdir(self::WP_LIBRARY_DIR_COPY_GIT);
         $this->execIn(self::WP_LIBRARY_DIR_COPY_GIT, 'git init');
         $this->execIn(self::WP_LIBRARY_DIR_COPY_GIT, 'git remote add origin git@github.com:woody-wordpress/woody-library.git');
         $this->execIn(self::WP_LIBRARY_DIR_COPY_GIT, 'git pull origin master');
@@ -115,10 +115,10 @@ class Library extends WoodyCommand
         $this->execIn(self::WP_LIBRARY_DIR_COPY_GIT, 'git config --local user.name "Woody Wordpress"');
 
         $this->consoleH2($this->output, 'Ajout du repository GIT');
-        $fs->mirror(self::WP_LIBRARY_DIR_COPY_GIT . '/.git', self::WP_LIBRARY_DIR . '/.git');
+        $filesystem->mirror(self::WP_LIBRARY_DIR_COPY_GIT . '/.git', self::WP_LIBRARY_DIR . '/.git');
 
         $this->consoleH2($this->output, 'Suppression du repository GIT');
-        $fs->remove(self::WP_LIBRARY_DIR_COPY_GIT);
+        $filesystem->remove(self::WP_LIBRARY_DIR_COPY_GIT);
 
         $this->consoleH2($this->output, 'Création du commit');
         try {
@@ -149,7 +149,7 @@ class Library extends WoodyCommand
         }
 
         $this->consoleH2($this->output, 'Suppression du répertoire woody-library');
-        $fs->remove(self::WP_LIBRARY_DIR);
+        $filesystem->remove(self::WP_LIBRARY_DIR);
 
         return WoodyCommand::SUCCESS;
     }

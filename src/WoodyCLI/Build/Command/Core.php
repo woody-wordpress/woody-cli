@@ -52,12 +52,12 @@ class Core extends WoodyCommand
         $this->input = $input;
         $this->output = $output;
 
-        $fs = new Filesystem();
+        $filesystem = new Filesystem();
 
         $this->consoleH1($this->output, 'Build de la version LITE du core');
 
         if (file_exists(self::WP_CORE_DIR)) {
-            $fs->remove(self::WP_CORE_DIR);
+            $filesystem->remove(self::WP_CORE_DIR);
         }
 
         $this->exec('git clone git@github.com:woody-wordpress-pro/woody-core.git ' . self::WP_CORE_DIR);
@@ -70,7 +70,7 @@ class Core extends WoodyCommand
         if (file_exists(self::WP_CORE_DIR_COPY_GIT)) {
             $this->consoleH2($this->output, 'Nettoyage woody-core (dossier GIT temporaire)');
             try {
-                $fs->remove(self::WP_CORE_DIR_COPY_GIT);
+                $filesystem->remove(self::WP_CORE_DIR_COPY_GIT);
             } catch (IOExceptionInterface $ioException) {
                 $this->consoleExec($this->output, "Erreur lors de la copie du répertoire " . $ioException->getPath());
             }
@@ -78,7 +78,7 @@ class Core extends WoodyCommand
 
         $this->consoleH2($this->output, 'Suppression du .git');
         try {
-            $fs->remove(self::WP_CORE_DIR . '/.git');
+            $filesystem->remove(self::WP_CORE_DIR . '/.git');
         } catch (IOExceptionInterface $ioException) {
             $this->consoleExec($this->output, "Erreur lors de la suppression du répertoire " . $ioException->getPath());
         }
@@ -116,7 +116,7 @@ class Core extends WoodyCommand
         $file = str_replace('\u00e9', 'é', $file);
         file_put_contents(self::WP_CORE_DIR . '/composer.json', $file);
 
-        $fs->remove(self::WP_CORE_DIR . '/composer.lock');
+        $filesystem->remove(self::WP_CORE_DIR . '/composer.lock');
 
         $this->consoleH2($this->output, 'Nettoyage du README.md');
         $file = file_get_contents(self::WP_CORE_DIR . '/README.md');
@@ -124,7 +124,7 @@ class Core extends WoodyCommand
         file_put_contents(self::WP_CORE_DIR . '/README.md', $file);
 
         $this->consoleH2($this->output, 'Initialisation repository GIT');
-        $fs->mkdir(self::WP_CORE_DIR_COPY_GIT);
+        $filesystem->mkdir(self::WP_CORE_DIR_COPY_GIT);
         $this->execIn(self::WP_CORE_DIR_COPY_GIT, 'git init');
         $this->execIn(self::WP_CORE_DIR_COPY_GIT, 'git remote add origin git@github.com:woody-wordpress/woody-core.git');
         $this->execIn(self::WP_CORE_DIR_COPY_GIT, 'git pull origin master');
@@ -133,10 +133,10 @@ class Core extends WoodyCommand
         $this->execIn(self::WP_CORE_DIR_COPY_GIT, 'git config --local user.name "Woody Wordpress"');
 
         $this->consoleH2($this->output, 'Ajout du repository GIT');
-        $fs->mirror(self::WP_CORE_DIR_COPY_GIT . '/.git', self::WP_CORE_DIR . '/.git');
+        $filesystem->mirror(self::WP_CORE_DIR_COPY_GIT . '/.git', self::WP_CORE_DIR . '/.git');
 
         $this->consoleH2($this->output, 'Suppression du repository GIT');
-        $fs->remove(self::WP_CORE_DIR_COPY_GIT);
+        $filesystem->remove(self::WP_CORE_DIR_COPY_GIT);
 
         $this->consoleH2($this->output, 'Création du commit');
         try {
@@ -167,7 +167,7 @@ class Core extends WoodyCommand
         }
 
         $this->consoleH2($this->output, 'Suppression du répertoire woody-core');
-        $fs->remove(self::WP_CORE_DIR);
+        $filesystem->remove(self::WP_CORE_DIR);
 
         return WoodyCommand::SUCCESS;
     }

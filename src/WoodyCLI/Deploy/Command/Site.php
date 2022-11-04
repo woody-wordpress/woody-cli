@@ -196,8 +196,8 @@ class Site extends WoodyCommand
         }
 
         // Theme commands
-        $config = $this->getSiteWPCommands();
-        foreach ($config as $status => $commands) {
+        $siteWPCommands = $this->getSiteWPCommands();
+        foreach ($siteWPCommands as $status => $commands) {
             foreach ($commands as $command) {
                 $this->consoleExec($this->output, sprintf('[%s] %s', $status, $command));
                 if ($status == 'run') {

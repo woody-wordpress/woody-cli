@@ -102,9 +102,9 @@ abstract class AbstractCommand extends Command
             throw new \RuntimeException($process->getErrorOutput());
         }
 
-        $return = $process->getOutput();
+        $output = $process->getOutput();
 
-        return trim($return);
+        return trim($output);
     }
 
     /**
@@ -229,8 +229,8 @@ abstract class AbstractCommand extends Command
 
     protected function consoleH1($output, $msg)
     {
-        $style = new OutputFormatterStyle('cyan', null, array('bold'));
-        $output->getFormatter()->setStyle('h1', $style);
+        $outputFormatterStyle = new OutputFormatterStyle('cyan', null, array('bold'));
+        $output->getFormatter()->setStyle('h1', $outputFormatterStyle);
 
         $output->writeln(sprintf('<h1>----------------------------------------------</>', $msg));
         $output->writeln(sprintf('<h1>%s</>', $msg));
@@ -239,15 +239,15 @@ abstract class AbstractCommand extends Command
 
     protected function consoleH2($output, $msg)
     {
-        $style = new OutputFormatterStyle('yellow', null, array());
-        $output->getFormatter()->setStyle('h2', $style);
+        $outputFormatterStyle = new OutputFormatterStyle('yellow', null, array());
+        $output->getFormatter()->setStyle('h2', $outputFormatterStyle);
         $output->writeln(sprintf('<h2>*** %s</>', mb_strtoupper($msg)));
     }
 
     protected function consoleList($output, $msg, $current = 0, $max = 0)
     {
-        $style = new OutputFormatterStyle('magenta', null, array());
-        $output->getFormatter()->setStyle('list', $style);
+        $outputFormatterStyle = new OutputFormatterStyle('magenta', null, array());
+        $output->getFormatter()->setStyle('list', $outputFormatterStyle);
 
         if (!empty($current) && !empty($max)) {
             $output->writeln(sprintf('<list># %s/%s %s</>', $current, $max, $msg));
@@ -258,8 +258,8 @@ abstract class AbstractCommand extends Command
 
     protected function consoleExec($output, $msg, $color = 'green')
     {
-        $style = new OutputFormatterStyle($color, null, array());
-        $output->getFormatter()->setStyle('cmd', $style);
+        $outputFormatterStyle = new OutputFormatterStyle($color, null, array());
+        $output->getFormatter()->setStyle('cmd', $outputFormatterStyle);
         $output->writeln(sprintf('<cmd>- %s</>', $msg));
     }
 
