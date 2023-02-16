@@ -56,7 +56,7 @@ class Site extends WoodyCommand
         $this->output = $output;
 
         $options = $input->getOption('options');
-        $options = explode(',', $options);
+        $options = (empty($options)) ? [] : explode(',', $options);
 
         $this->setEnv($input->getOption('env'));
         $this->setSiteKey($input->getOption('site'));
