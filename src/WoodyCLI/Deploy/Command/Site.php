@@ -97,7 +97,7 @@ class Site extends WoodyCommand
                     $this->woody_install();
                 }
 
-                if (!in_array('no-updb', $options) && !in_array('speed', $options)) {
+                if (!in_array('no-updb', $options)) {
                     $this->woody_database_update();
                 }
 
