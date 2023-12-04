@@ -32,7 +32,7 @@ class Sites extends WoodyCommand
             ->setName('deploy:sites')
             ->setDescription('Déployer tous les sites')
             // Options
-            ->addOption('options', 'o', InputOption::VALUE_OPTIONAL, 'Options (force,no-gulp,no-twig)')
+            ->addOption('options', 'o', InputOption::VALUE_OPTIONAL, 'Options (force,no-build,no-twig)')
             ->addOption('env', 'e', InputOption::VALUE_OPTIONAL, 'Environnement', 'dev');
     }
 

@@ -43,10 +43,10 @@ composer require woody-wordpress/woody-cli
 This command includes options :
 
 ```bash
-./bin/woody deploy:site -s mywebsite -o no-gulp,no-twig,no-varnish
+./bin/woody deploy:site -s mywebsite -o no-build,no-twig,no-varnish
 ```
 
-- **no-gulp** : does not compile assets
+- **no-build** : does not compile assets
 - **no-twig** : does not empty the twig cache shared with all site instances
 - **no-varnish** : does not start the emptying of the varnish cache of the site
 

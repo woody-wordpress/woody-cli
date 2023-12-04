@@ -20,12 +20,6 @@ abstract class WoodyCommand extends AbstractCommand
     protected $output;
 
     /**
-     * Path to gulp directory
-     * @var string
-     */
-    public const WP_GULP_DIR = WP_ROOT_DIR . '/gulp';
-
-    /**
      * Path to the configuration file of a site (with wildcard)
      * @var string
      */

@@ -42,7 +42,7 @@ class Site extends WoodyCommand
             ->setName('deploy:site')
             ->setDescription('Déployer un site')
             // Options
-            ->addOption('options', 'o', InputOption::VALUE_OPTIONAL, 'Options (force,no-gulp,no-twig)')
+            ->addOption('options', 'o', InputOption::VALUE_OPTIONAL, 'Options (force,no-build,no-twig)')
             ->addOption('site', 's', InputOption::VALUE_REQUIRED, 'Site Key')
             ->addOption('env', 'e', InputOption::VALUE_OPTIONAL, 'Environnement', 'dev');
     }
@@ -107,7 +107,7 @@ class Site extends WoodyCommand
 
                 $this->woody_maintenance_on();
 
-                if (!in_array('no-gulp', $options) && !in_array('speed', $options)) {
+                if (!in_array('no-build', $options) && !in_array('speed', $options)) {
                     $this->woody_assets();
                 }
 
@@ -250,7 +250,7 @@ class Site extends WoodyCommand
     private function woody_assets()
     {
         $this->consoleH2($this->output, 'Compilation des Assets');
-        $this->execIn(self::WP_GULP_DIR, 'yarn build --site ' . $this->site_key . ' --env ' . $this->env);
+        $this->execIn(WP_ROOT_DIR, 'yarn build -s ' . $this->site_key . ' -e ' . $this->env);
     }
 
     // WP Cache Flush Core
