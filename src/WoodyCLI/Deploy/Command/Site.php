@@ -89,7 +89,10 @@ class Site extends WoodyCommand
                 $this->consoleH1($this->output, sprintf('Mise à jour du projet "%s"', $this->site_key));
             }
 
-            if ($this->is_exist) {
+            // Is Cloned
+            $this->is_cloned = $this->fs->exists(sprintf(self::WP_SITE_DIR, $this->site_key) . '/style.css');
+
+            if ($this->is_cloned) {
                 if (!in_array('no-install', $options) && !in_array('speed', $options) && !in_array('multi-site', $options)) {
                     $this->woody_install();
                 }
