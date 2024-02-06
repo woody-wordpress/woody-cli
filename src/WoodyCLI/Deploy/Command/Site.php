@@ -74,7 +74,7 @@ class Site extends WoodyCommand
             }
 
             // Is Install
-            $this->is_exist = $this->fs->exists(sprintf(self::WP_SITE_DIR, $this->site_key));
+            $this->is_exist = $this->fs->exists(sprintf(self::WP_SITE_DIR, $this->site_key) . '/style.css');
             $this->is_install = $this->fs->exists(sprintf(self::WP_SITE_UPLOADS_DIR . '/woody-cli.lock', $this->site_key));
 
             // Tasks

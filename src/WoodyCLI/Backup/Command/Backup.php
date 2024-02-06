@@ -82,11 +82,10 @@ class Backup extends WoodyCommand
         }
 
         // Is Install
-        $this->is_exist = $this->fs->exists(sprintf(self::WP_SITE_DIR, $this->site_key));
+        $this->is_exist = $this->fs->exists(sprintf(self::WP_SITE_DIR, $this->site_key) . '/style.css');
         $this->is_install = $this->fs->exists(sprintf(self::WP_SITE_UPLOADS_DIR . '/woody-cli.lock', $this->site_key));
-        $this->is_cloned = $this->fs->exists(sprintf(self::WP_SITE_DIR, $this->site_key) . '/style.css');
 
-        if ($this->is_exist && $this->is_install && $this->is_cloned) {
+        if ($this->is_exist && $this->is_install) {
             $this->woody_maintenance_on();
             $this->backup_init();
 
