@@ -58,10 +58,6 @@ class Core extends WoodyCommand
                 $this->symlink(sprintf(self::WP_DEPLOY_SITE_DIR, $site_key), sprintf(self::WP_SITE_DIR, $site_key));
                 $this->consoleExec($this->output, sprintf($site_key . ' (%s)', sprintf(self::WP_SITE_DIR, $site_key)));
             }
-        } else {
-            $this->consoleH2($this->output, 'Installation du symlink de config');
-            $this->symlink(WP_DEPLOY_DIR . '/shared/config/sites', parent::WP_CONFIG_DIRS);
-            $this->consoleExec($this->output, sprintf('%s >> %s', WP_DEPLOY_DIR . '/shared/config/sites', parent::WP_CONFIG_DIRS));
         }
     }
 }
