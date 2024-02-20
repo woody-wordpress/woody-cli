@@ -250,7 +250,7 @@ class Site extends WoodyCommand
     private function woody_assets()
     {
         $this->consoleH2($this->output, 'Compilation des Assets');
-        $this->execIn(WP_ROOT_DIR, 'n exec auto yarn build -s ' . $this->site_key . ' -e ' . $this->env);
+        $this->execIn(WP_ROOT_DIR, 'n auto && n exec auto yarn build -s ' . $this->site_key . ' -e ' . $this->env);
     }
 
     // WP Cache Flush Core
