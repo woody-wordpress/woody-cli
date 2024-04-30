@@ -134,7 +134,7 @@ class Site extends WoodyCommand
                 }
 
                 if (!empty($this->site_config['WOODY_CLOUDFLARE_ENABLE']) && !in_array('no-cdn', $options) && !in_array('speed', $options)) {
-                    $this->woody_flush_cloudflare();
+                    $this->woody_flush_cdn();
                 }
 
                 if (!empty($this->site_config['WOODY_SSO_SECRET_URL']) && !in_array('no-sso', $options) && !in_array('speed', $options) && !in_array('multi-site', $options)) {
@@ -289,10 +289,10 @@ class Site extends WoodyCommand
     }
 
     // WP CDN CLOUDFLARE Flush
-    private function woody_flush_cloudflare()
+    private function woody_flush_cdn()
     {
-        $this->consoleH2($this->output, 'Purge du CDN CLOUDFLARE');
-        $this->wp('woody_flush_cloudflare');
+        $this->consoleH2($this->output, 'Purge du CDN');
+        $this->wp('woody_flush_cdn');
     }
 
     // WP Add SSO Domains
