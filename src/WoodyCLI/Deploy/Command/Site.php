@@ -286,7 +286,11 @@ class Site extends WoodyCommand
     // WP Varnish Flush
     private function woody_flush_varnish()
     {
-        $this->consoleH2($this->output, 'Purge du VARNISH');
+        if (!empty($this->site_config['WOODY_CLOUDFLARE_ENABLE']) && !empty($this->site_config['WOODY_CLOUDFLARE_URL'])  && strpos($this->site_config['WOODY_CLOUDFLARE_URL'], 'cloudly.space') !== false) {
+            $this->consoleH2($this->output, 'Purge du VARNISH');
+        } else {
+            $this->consoleH2($this->output, 'Purge du VARNISH + CDN');
+        }
         $this->wp('woody:varnish flush');
     }
 
