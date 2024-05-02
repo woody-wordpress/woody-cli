@@ -133,7 +133,7 @@ class Site extends WoodyCommand
                     $this->woody_flush_varnish();
                 }
 
-                if (!empty($this->site_config['WOODY_CLOUDFLARE_ENABLE']) && !in_array('no-cdn', $options) && !in_array('speed', $options)) {
+                if (!empty($this->site_config['WOODY_CLOUDFLARE_ENABLE']) && !empty($this->site_config['WOODY_CLOUDFLARE_URL'])  && strpos($this->site_config['WOODY_CLOUDFLARE_URL'], 'cloudly.space') !== false && !in_array('no-cdn', $options) && !in_array('speed', $options)) {
                     $this->woody_flush_cdn();
                 }
 
