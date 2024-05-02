@@ -285,14 +285,14 @@ class Site extends WoodyCommand
     private function woody_flush_varnish()
     {
         $this->consoleH2($this->output, 'Purge du VARNISH');
-        $this->wp('woody_flush_varnish');
+        $this->wp('woody:varnish flush');
     }
 
     // WP CDN CLOUDFLARE Flush
     private function woody_flush_cdn()
     {
         $this->consoleH2($this->output, 'Purge du CDN');
-        $this->wp('woody_flush_cdn');
+        $this->wp('woody:cdn flush');
     }
 
     // WP Add SSO Domains
