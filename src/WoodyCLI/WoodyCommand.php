@@ -38,29 +38,27 @@ abstract class WoodyCommand extends AbstractCommand
         parent::__construct($name);
         $this->fs = new Filesystem();
 
-        if(strpos(WP_ROOT_DIR, 'woody_status') !== false) {
-            $this->multicore = true;
-            $this->paths = [
-                'WP_SITE_DIR' => WP_ROOT_DIR . '/web/app/themes/%s',
-                'WP_SITE_UPLOADS_DIR' => WP_ROOT_DIR . '/web/app/uploads/%s',
-                'WP_CACHE_DIR' => WP_ROOT_DIR . '/web/app/cache',
-                'WP_TIMBER_DIR' => WP_ROOT_DIR . '/web/app/cache/timber',
-                'WP_DEPLOY_SITE_DIR' => WP_DEPLOY_DIR . '/sites/%s/current',
-                'WP_SITE_CLI_DIR' => WP_ROOT_DIR . '/web/app/themes/%s/cli'
-            ];
-        } else {
-            $this->multicore = false;
-            $this->paths = [
-                'WP_CONFIG_DIRS' => WP_ROOT_DIR . '/config/sites',
-                'WP_THEMES_DIR' => WP_ROOT_DIR . '/web/app/themes',
-                'WP_SITE_DIR' => WP_ROOT_DIR . '/web/app/themes/%s',
-                'WP_SITE_UPLOADS_DIR' => WP_ROOT_DIR . '/web/app/uploads/%s',
-                'WP_CACHE_DIR' => WP_ROOT_DIR . '/web/app/cache',
-                'WP_TIMBER_DIR' => WP_ROOT_DIR . '/web/app/cache/timber',
-                'WP_DEPLOY_SITE_DIR' => WP_DEPLOY_DIR . '/sites/%s/current',
-                'WP_SITE_CLI_DIR' => WP_ROOT_DIR . '/web/app/themes/%s/cli'
-            ];
+        // On récupère le chemin du core et on le remplace par une chaine avec %s à la place du core_key
+        $root_dir = explode('/', WP_ROOT_DIR);
+        if (count($root_dir) >= 2) {
+            end($root_dir);
+            $this->core_path = str_replace(prev($root_dir), '%s',WP_ROOT_DIR);
         }
+
+        print_r($this->core_path);
+        exit();
+
+        $this->multicore = (strpos(WP_ROOT_DIR, 'woody_status') !== false);
+        $this->paths = [
+            'WP_CONFIG_DIRS' => $this->core_path . '/config/sites',
+            'WP_THEMES_DIR' => $this->core_path . '/web/app/themes',
+            'WP_SITE_DIR' => $this->core_path . '/web/app/themes/%s',
+            'WP_SITE_UPLOADS_DIR' => $this->core_path . '/web/app/uploads/%s',
+            'WP_CACHE_DIR' => $this->core_path . '/web/app/cache',
+            'WP_TIMBER_DIR' => $this->core_path . '/web/app/cache/timber',
+            'WP_DEPLOY_SITE_DIR' => WP_DEPLOY_DIR . '/sites/%s/current',
+            'WP_SITE_CLI_DIR' => $this->core_path . '/web/app/themes/%s/cli'
+        ];
     }
 
     /**
@@ -191,7 +189,7 @@ abstract class WoodyCommand extends AbstractCommand
             $this->core_key = $this->sites[$this->site_key]['core']['key'];
             return $this->sites[$this->site_key]['env'];
         } else {
-            $root_dir = explode(WP_ROOT_DIR, '/');
+            $root_dir = explode('/', WP_ROOT_DIR);
             if (count($root_dir) >= 2) {
                 end($root_dir);
                 $this->core_key = prev($root_dir);
