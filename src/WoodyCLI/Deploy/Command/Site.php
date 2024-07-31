@@ -79,14 +79,14 @@ class Site extends WoodyCommand
 
             // Tasks
             if (!$this->is_exist) {
-                $this->consoleH1($this->output, sprintf('Installation du projet "%s"', $this->site_key));
+                $this->consoleH1($this->output, sprintf('Installation "%s"', $this->site_key));
                 if ($this->env == 'dev') {
                     $this->git();
                 } else {
                     $this->link();
                 }
             } else {
-                $this->consoleH1($this->output, sprintf('Mise à jour du projet "%s"', $this->site_key));
+                $this->consoleH1($this->output, sprintf('Mise à jour "%s" sur "%s"', $this->site_key, $this->core_key));
             }
 
             // Is Cloned
