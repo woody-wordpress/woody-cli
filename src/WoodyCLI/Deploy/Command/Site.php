@@ -66,7 +66,7 @@ class Site extends WoodyCommand
         if (!empty($this->site_config['WOODY_ACCESS_LOCKED']) && $this->site_config['WOODY_ACCESS_LOCKED']) {
             $this->consoleH1($this->output, sprintf('Projet "%s" fermé', $this->site_key));
         } else {
-            $this->site_dir = sprintf(self::WP_SITE_DIR, $this->site_key);
+            $this->site_dir = sprintf($this->paths['WP_SITE_DIR'], $this->site_key);
 
             // Force Delete
             if (in_array('force', $options) && $this->env == 'dev') {
@@ -74,8 +74,8 @@ class Site extends WoodyCommand
             }
 
             // Is Install
-            $this->is_exist = $this->fs->exists(sprintf(self::WP_SITE_DIR, $this->site_key) . '/style.css');
-            $this->is_install = $this->fs->exists(sprintf(self::WP_SITE_UPLOADS_DIR . '/woody-cli.lock', $this->site_key));
+            $this->is_exist = $this->fs->exists(sprintf($this->paths['WP_SITE_DIR'], $this->site_key) . '/style.css');
+            $this->is_install = $this->fs->exists(sprintf($this->paths['WP_SITE_UPLOADS_DIR'] . '/woody-cli.lock', $this->site_key));
 
             // Tasks
             if (!$this->is_exist) {
@@ -90,7 +90,7 @@ class Site extends WoodyCommand
             }
 
             // Is Cloned
-            $this->is_cloned = $this->fs->exists(sprintf(self::WP_SITE_DIR, $this->site_key) . '/style.css');
+            $this->is_cloned = $this->fs->exists(sprintf($this->paths['WP_SITE_DIR'], $this->site_key) . '/style.css');
 
             if ($this->is_cloned) {
                 if (!in_array('no-install', $options) && !in_array('speed', $options) && !in_array('multi-site', $options)) {
@@ -160,8 +160,8 @@ class Site extends WoodyCommand
     private function link()
     {
         $this->consoleH2($this->output, sprintf('Création du symlink "%s"', $this->site_key));
-        $this->symlink(sprintf(self::WP_DEPLOY_SITE_DIR, $this->site_key), sprintf(self::WP_SITE_DIR, $this->site_key));
-        $this->consoleExec($this->output, sprintf($this->site_key . ' (%s)', sprintf(self::WP_SITE_DIR, $this->site_key)));
+        $this->symlink(sprintf($this->paths['WP_DEPLOY_SITE_DIR'], $this->site_key), sprintf($this->paths['WP_SITE_DIR'], $this->site_key));
+        $this->consoleExec($this->output, sprintf($this->site_key . ' (%s)', sprintf($this->paths['WP_SITE_DIR'], $this->site_key)));
     }
 
     // WP Env file
