@@ -7,6 +7,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
+use Woody\Status\Services\StatusManager;
 
 /**
  * Deploy
@@ -25,6 +26,7 @@ abstract class WoodyCommand extends AbstractCommand
     protected $fs;
     protected $lock;
     protected $paths;
+    protected $multicore;
 
     /**
      * __construct()
@@ -34,16 +36,32 @@ abstract class WoodyCommand extends AbstractCommand
     {
         parent::__construct($name);
         $this->fs = new Filesystem();
-        $this->paths = [
-            'WP_CONFIG_DIRS' => WP_ROOT_DIR . '/config/sites',
-            'WP_THEMES_DIR' => WP_ROOT_DIR . '/web/app/themes',
-            'WP_SITE_DIR' => WP_ROOT_DIR . '/web/app/themes/%s',
-            'WP_SITE_UPLOADS_DIR' => WP_ROOT_DIR . '/web/app/uploads/%s',
-            'WP_CACHE_DIR' => WP_ROOT_DIR . '/web/app/cache',
-            'WP_TIMBER_DIR' => WP_ROOT_DIR . '/web/app/cache/timber',
-            'WP_DEPLOY_SITE_DIR' => WP_DEPLOY_DIR . '/sites/%s/current',
-            'WP_SITE_CLI_DIR' => WP_ROOT_DIR . '/web/app/themes/%s/cli'
-        ];
+
+        if(strpos(WP_ROOT_DIR, 'woody_status') !== false) {
+            $this->multicore = true;
+            $this->paths = [
+                'WP_CONFIG_DIRS' => WP_ROOT_DIR . '/config/sites',
+                'WP_THEMES_DIR' => WP_ROOT_DIR . '/web/app/themes',
+                'WP_SITE_DIR' => WP_ROOT_DIR . '/web/app/themes/%s',
+                'WP_SITE_UPLOADS_DIR' => WP_ROOT_DIR . '/web/app/uploads/%s',
+                'WP_CACHE_DIR' => WP_ROOT_DIR . '/web/app/cache',
+                'WP_TIMBER_DIR' => WP_ROOT_DIR . '/web/app/cache/timber',
+                'WP_DEPLOY_SITE_DIR' => WP_DEPLOY_DIR . '/sites/%s/current',
+                'WP_SITE_CLI_DIR' => WP_ROOT_DIR . '/web/app/themes/%s/cli'
+            ];
+        } else {
+            $this->multicore = false;
+            $this->paths = [
+                'WP_CONFIG_DIRS' => WP_ROOT_DIR . '/config/sites',
+                'WP_THEMES_DIR' => WP_ROOT_DIR . '/web/app/themes',
+                'WP_SITE_DIR' => WP_ROOT_DIR . '/web/app/themes/%s',
+                'WP_SITE_UPLOADS_DIR' => WP_ROOT_DIR . '/web/app/uploads/%s',
+                'WP_CACHE_DIR' => WP_ROOT_DIR . '/web/app/cache',
+                'WP_TIMBER_DIR' => WP_ROOT_DIR . '/web/app/cache/timber',
+                'WP_DEPLOY_SITE_DIR' => WP_DEPLOY_DIR . '/sites/%s/current',
+                'WP_SITE_CLI_DIR' => WP_ROOT_DIR . '/web/app/themes/%s/cli'
+            ];
+        }
     }
 
     /**
@@ -96,7 +114,7 @@ abstract class WoodyCommand extends AbstractCommand
      */
     protected function loadSites()
     {
-        if(strpos(WP_ROOT_DIR, 'woody_status') !== false) {
+        if($this->multicore) {
             return $this->loadSitesFromStatus();
         } else {
             return $this->loadSitesFromCore();
@@ -105,7 +123,9 @@ abstract class WoodyCommand extends AbstractCommand
 
     protected function loadSitesFromStatus()
     {
-        print 'hello';
+        $statusManager = new StatusManager();
+        $sites = $statusManager->getSites();
+        return $sites;
     }
 
     /**
@@ -168,49 +188,50 @@ abstract class WoodyCommand extends AbstractCommand
             throw new \RuntimeException('Aucun site_key défini');
         }
 
-        $config = $this->sites[$this->site_key];
-        foreach ($config as $key => $val) {
-            $val = str_replace("'", '', $val);
-
-            if (strpos($val, '[') !== false) {
-                $val = str_replace(array('[', ']', '"', ' '), '', $val);
-                $val = (empty($val)) ? [] : explode(',', $val);
-            } elseif (strpos($val, 'true') !== false) {
-                $val = true;
-            } elseif (strpos($val, 'false') !== false) {
-                $val = false;
-            }
-
-            $return[$key] = $val;
+        if ($this->multicore) {
+            return $this->sites[$this->site_key]['env'];
+        } else {
+            return $this->sites[$this->site_key];
         }
 
         return $return;
     }
 
-    /**
-     * Transform .env file to array PHP
-     *
-     * @param [string] $data
-     * @return array
-     */
-    protected function getDotEnv($path)
+    protected function array_env($env)
     {
-        $return = [];
+        $env = str_replace(array('[', ']', '"', ' '), '', $env);
+        $env = (empty($env)) ? [] : explode(',', $env);
+        sort($env);
+        return array_unique($env);
+    }
 
-        $data = file_get_contents($path);
-        if (!empty($data)) {
-            $lines = explode("\n", $data);
-            foreach ($lines as $line) {
-                if (empty($line)) {
-                    continue;
+    protected function getDotEnv($file)
+    {
+        $env = [];
+        $file = file_get_contents($file);
+        $file = explode("\n", $file);
+        foreach ($file as $line) {
+            if (!empty($line)) {
+                $line = explode('=', $line);
+                $key = $line[0];
+                $val = $line[1];
+                if (substr($val, 0, 1) == '"' || substr($val, 0, 1) == "'") {
+                    $val = substr(substr($val, 1), 0, -1);
                 }
 
-                $line = explode("=", $line);
-                $return[$line[0]] = $line[1];
+                if (substr($val, 0, 1) == '[' && substr($val, -1) == ']') {
+                    $val = self::array_env($val);
+                } elseif (strpos($val, 'false') !== false) {
+                    $val = false;
+                } elseif (strpos($val, 'true') !== false) {
+                    $val = true;
+                }
+
+                $env[$key] = $val;
             }
         }
 
-        return $return;
+        return $env;
     }
 
     /**
