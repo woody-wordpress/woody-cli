@@ -259,7 +259,6 @@ abstract class WoodyCommand extends AbstractCommand
         $start_config[] = 'post delete 3 --force --defer-term-counting';
 
         $start_config[] = 'theme activate ' . $this->site_key;
-        $start_config[] = 'theme delete twentytwentyfour';
         $start_config[] = 'theme delete twentytwentythree';
         $start_config[] = 'theme delete twentytwentytwo';
         $start_config[] = 'theme delete twentytwentyone';
