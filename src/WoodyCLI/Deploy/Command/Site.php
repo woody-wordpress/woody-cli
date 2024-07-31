@@ -257,7 +257,7 @@ class Site extends WoodyCommand
         } else {
             $cmd = 'yarn build --site ' . $this->site_key . ' --env ' . $this->env;
             $this->consoleExec($this->output, $cmd);
-            $this->execIn(self::WP_GULP_DIR, $cmd);
+            $this->execIn(WP_ROOT_DIR . '/gulp', $cmd);
         }
     }
 
