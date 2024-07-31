@@ -107,7 +107,7 @@ class Site extends WoodyCommand
 
                 $this->woody_maintenance_on();
 
-                if (!in_array('no-build', $options) && !in_array('speed', $options)) {
+                if (!in_array('no-build', $options) && !in_array('no-gulp', $options) && !in_array('speed', $options)) {
                     $this->woody_assets();
                 }
 
