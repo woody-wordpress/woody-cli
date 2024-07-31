@@ -21,6 +21,7 @@ abstract class WoodyCommand extends AbstractCommand
     protected $output;
     protected $sites = [];
     protected $site_key;
+    protected $core_key;
     protected $env = 'dev';
     protected $twig;
     protected $fs;
@@ -40,8 +41,6 @@ abstract class WoodyCommand extends AbstractCommand
         if(strpos(WP_ROOT_DIR, 'woody_status') !== false) {
             $this->multicore = true;
             $this->paths = [
-                'WP_CONFIG_DIRS' => WP_ROOT_DIR . '/config/sites',
-                'WP_THEMES_DIR' => WP_ROOT_DIR . '/web/app/themes',
                 'WP_SITE_DIR' => WP_ROOT_DIR . '/web/app/themes/%s',
                 'WP_SITE_UPLOADS_DIR' => WP_ROOT_DIR . '/web/app/uploads/%s',
                 'WP_CACHE_DIR' => WP_ROOT_DIR . '/web/app/cache',
@@ -189,8 +188,14 @@ abstract class WoodyCommand extends AbstractCommand
         }
 
         if ($this->multicore) {
+            $this->core_key = $this->sites[$this->site_key]['core']['key'];
             return $this->sites[$this->site_key]['env'];
         } else {
+            $root_dir = explode(WP_ROOT_DIR, '/');
+            if (count($root_dir) >= 2) {
+                end($root_dir);
+                $this->core_key = prev($root_dir);
+            }
             return $this->sites[$this->site_key];
         }
 
