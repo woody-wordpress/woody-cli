@@ -55,13 +55,14 @@ class Core extends WoodyCommand
             $this->sites = $this->loadSites();
             $this->consoleH2($this->output, 'Installation des symlinks de sites');
             foreach (array_keys($this->sites) as $site_key) {
-                $this->symlink(sprintf($this->paths['WP_DEPLOY_SITE_DIR'], $site_key), sprintf($this->paths['WP_SITE_DIR'], $site_key));
-                $this->consoleExec($this->output, sprintf($site_key . ' (%s)', sprintf($this->paths['WP_SITE_DIR'], $site_key)));
+                $this->symlink(sprintf($this->paths['WP_DEPLOY_SITE_DIR'], $this->core_key, $site_key), sprintf($this->paths['WP_SITE_DIR'], $this->core_key, $site_key));
+                $this->consoleExec($this->output, sprintf($site_key . ' (%s)', sprintf($this->paths['WP_SITE_DIR'], $this->core_key, $site_key)));
             }
         } else {
+            $config_dirs = WP_ROOT_DIR . '/config/sites'; //TODO: use other than config_dirs and WP_DEPLOY_DIR
             $this->consoleH2($this->output, 'Installation du symlink de config');
-            $this->symlink(WP_DEPLOY_DIR . '/shared/config/sites', $this->paths['WP_CONFIG_DIRS']); //TODO: use other than WP_CONFIG_DIRS and WP_DEPLOY_DIR
-            $this->consoleExec($this->output, sprintf('%s >> %s', WP_DEPLOY_DIR . '/shared/config/sites', $this->paths['WP_CONFIG_DIRS']));
+            $this->symlink(WP_DEPLOY_DIR . '/shared/config/sites', $config_dirs);
+            $this->consoleExec($this->output, sprintf('%s >> %s', WP_DEPLOY_DIR . '/shared/config/sites', $config_dirs));
         }
     }
 }
