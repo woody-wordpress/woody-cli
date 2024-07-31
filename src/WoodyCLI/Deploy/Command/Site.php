@@ -253,11 +253,11 @@ class Site extends WoodyCommand
         if($this->core_key == 'woody_02') {
             $cmd = 'yarn build -s ' . $this->site_key . ' -e ' . $this->env;
             $this->consoleExec($this->output, $cmd);
-            $this->execIn(WP_ROOT_DIR, $cmd);
+            $this->execIn(sprintf($this->core_path, $this->core_key), $cmd);
         } else {
             $cmd = 'yarn build --site ' . $this->site_key . ' --env ' . $this->env;
             $this->consoleExec($this->output, $cmd);
-            $this->execIn(WP_ROOT_DIR . '/gulp', $cmd);
+            $this->execIn(sprintf($this->core_path, $this->core_key) . '/gulp', $cmd);
         }
     }
 

@@ -325,7 +325,7 @@ abstract class WoodyCommand extends AbstractCommand
     protected function wp($command, $exit_on_fail = true)
     {
         try {
-            $callback = $this->execIn(WP_ROOT_DIR, sprintf('WP_SITE_KEY=%s wp %s --allow-root', $this->site_key, $command));
+            $callback = $this->execIn(sprintf($this->core_path, $this->core_key), sprintf('WP_SITE_KEY=%s wp %s --allow-root', $this->site_key, $command));
             return $callback;
         } catch (\Exception $exception) {
             if ($exit_on_fail) {
