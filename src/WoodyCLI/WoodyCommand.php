@@ -50,7 +50,7 @@ abstract class WoodyCommand extends AbstractCommand
             'WP_SITE_DIR' => $this->core_path . '/web/app/themes/%s',
             'WP_SITE_UPLOADS_DIR' => $this->core_path . '/web/app/uploads/%s',
             'WP_DEPLOY_SITE_DIR' => WP_DEPLOY_DIR . '/sites/%s/current',
-            'WP_SITE_CLI_DIR' => $this->core_path . '/web/app/themes/%s/cli'
+            'WP_SITE_CLI_DIR' => $this->core_path . '/web/app/themes/%s/cli',
         ];
     }
 

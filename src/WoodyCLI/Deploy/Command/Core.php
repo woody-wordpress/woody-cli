@@ -31,6 +31,7 @@ class Core extends WoodyCommand
             ->setName('deploy:core')
             ->setDescription('Déployer le core')
             // Options
+            ->addOption('core', 'c', InputOption::VALUE_OPTIONAL, 'Core', null)
             ->addOption('env', 'e', InputOption::VALUE_OPTIONAL, 'Environnement', 'dev');
     }
 
@@ -51,18 +52,25 @@ class Core extends WoodyCommand
 
     private function symlinks()
     {
-        if ($this->env != 'dev') {
-            $this->sites = $this->loadSites();
-            $this->consoleH2($this->output, 'Installation des symlinks de sites');
-            foreach (array_keys($this->sites) as $site_key) {
-                $this->symlink(sprintf($this->paths['WP_DEPLOY_SITE_DIR'], $this->core_key, $site_key), sprintf($this->paths['WP_SITE_DIR'], $this->core_key, $site_key));
-                $this->consoleExec($this->output, sprintf($site_key . ' (%s)', sprintf($this->paths['WP_SITE_DIR'], $this->core_key, $site_key)));
+        $this->sites = $this->loadSites();
+        $this->consoleH2($this->output, 'Installation des symlinks de sites');
+
+        foreach ($this->sites as $site_key => $site) {
+            $core_key = $site['core']['key'];
+            if(!empty($this->input->getOption('core')) && $core_key != $this->input->getOption('core')) {
+                continue;
             }
-        } else {
-            $config_dirs = WP_ROOT_DIR . '/config/sites'; //TODO: use other than config_dirs and WP_DEPLOY_DIR
-            $this->consoleH2($this->output, 'Installation du symlink de config');
-            $this->symlink(WP_DEPLOY_DIR . '/shared/config/sites', $config_dirs);
-            $this->consoleExec($this->output, sprintf('%s >> %s', WP_DEPLOY_DIR . '/shared/config/sites', $config_dirs));
+
+            $this->symlink(sprintf('/home/admin/www/themes/%s/current', $site_key), sprintf($this->paths['WP_SITE_DIR'], $core_key, $site_key));
+            $this->consoleExec($this->output, sprintf($site_key . ' (%s > %s)', sprintf('/home/admin/www/themes/%s/current', $site_key), sprintf($this->paths['WP_SITE_DIR'], $core_key, $site_key)));
         }
+
+        // // Sur le dev, il faut relier les confs qui sont normalement lier par Capistrano
+        // if ($this->env == 'dev') {
+        //     $config_dirs = WP_ROOT_DIR . '/config/sites'; //TODO: use other than config_dirs and WP_DEPLOY_DIR
+        //     $this->consoleH2($this->output, 'Installation du symlink de config');
+        //     $this->symlink(WP_DEPLOY_DIR . '/shared/config/sites', $config_dirs);
+        //     $this->consoleExec($this->output, sprintf('%s >> %s', WP_DEPLOY_DIR . '/shared/config/sites', $config_dirs));
+        // }
     }
 }
