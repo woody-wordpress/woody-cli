@@ -62,7 +62,7 @@ class Core extends WoodyCommand
             }
 
             $this->symlink(sprintf('/home/admin/www/themes/%s/current', $site_key), sprintf($this->paths['WP_SITE_DIR'], $core_key, $site_key));
-            $this->consoleExec($this->output, sprintf($site_key . ' (%s > %s)', sprintf('/home/admin/www/themes/%s/current', $site_key), sprintf($this->paths['WP_SITE_DIR'], $core_key, $site_key)));
+            $this->consoleExec($this->output, sprintf('%s : %s (%s > %s)', $core_key, $site_key, sprintf('/home/admin/www/themes/%s/current', $site_key), sprintf($this->paths['WP_SITE_DIR'], $core_key, $site_key)));
         }
 
         // // Sur le dev, il faut relier les confs qui sont normalement lier par Capistrano
