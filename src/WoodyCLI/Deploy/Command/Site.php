@@ -66,33 +66,34 @@ class Site extends WoodyCommand
         if (!empty($this->site_config['WOODY_ACCESS_LOCKED']) && $this->site_config['WOODY_ACCESS_LOCKED']) {
             $this->consoleH1($this->output, sprintf('Projet "%s" fermé', $this->site_key));
         } else {
-            $this->site_dir = sprintf($this->paths['WP_SITE_DIR'], $this->core_key, $this->site_key);
+            $this->consoleH1($this->output, sprintf('Mise à jour "%s" sur "%s"', $this->site_key, $this->core_key));
 
             // Force Delete
             if (in_array('force', $options) && $this->env == 'dev') {
                 $this->wp_delete();
             }
 
-            // Is Install
-            $this->is_exist = $this->fs->exists(sprintf($this->paths['WP_SITE_DIR'], $this->core_key, $this->site_key) . '/style.css');
-            $this->is_install = $this->fs->exists(sprintf($this->paths['WP_SITE_UPLOADS_DIR'] . '/woody-cli.lock', $this->core_key, $this->site_key));
-
-            // Tasks
-            if (!$this->is_exist) {
-                $this->consoleH1($this->output, sprintf('Installation "%s"', $this->site_key));
+            // Is Cloned
+            $this->clone_site_dir = sprintf($this->paths['WP_THEMES_PATH'], $this->site_key);
+            $this->is_cloned = $this->fs->exists($this->clone_site_dir . '/style.css');
+            if (!$this->is_cloned) {
                 if ($this->env == 'dev') {
-                    $this->git();
+                    $this->git_clone();
                 } else {
-                    $this->link();
+                    $this->consoleH2($this->output, sprintf('Le projet "%s" n\'a jamais été cloné', $this->site_key));
                 }
-            } else {
-                $this->consoleH1($this->output, sprintf('Mise à jour "%s" sur "%s"', $this->site_key, $this->core_key));
             }
 
-            // Is Cloned
-            $this->is_cloned = $this->fs->exists(sprintf($this->paths['WP_SITE_DIR'], $this->core_key, $this->site_key) . '/style.css');
+            // Is Linked inside Core
+            $this->is_linked = $this->fs->exists(sprintf($this->paths['WP_SITE_DIR'], $this->core_key, $this->site_key) . '/style.css');
+            if (!$this->is_linked) {
+                $this->link();
+            }
 
-            if ($this->is_cloned) {
+            $this->is_exist = $this->fs->exists(sprintf($this->paths['WP_SITE_DIR'], $this->core_key, $this->site_key) . '/style.css');
+            if ($this->is_exist) {
+                $this->is_install = $this->fs->exists(sprintf($this->paths['WP_SITE_UPLOADS_DIR'] . '/woody-cli.lock', $this->core_key, $this->site_key));
+
                 if (!in_array('no-install', $options) && !in_array('speed', $options) && !in_array('multi-site', $options)) {
                     $this->woody_install();
                 }
@@ -149,19 +150,19 @@ class Site extends WoodyCommand
     }
 
     // Git clone
-    private function git()
+    private function git_clone()
     {
         $site_repository = $this->site_config['WP_GIT_REPOSITORY'];
         $this->consoleH2($this->output, sprintf('Clone du dépôt "%s"', $site_repository));
-        $this->exec(sprintf('git clone %s %s', $site_repository, $this->site_dir));
+        $this->exec(sprintf('git clone %s %s', $site_repository, $this->clone_site_dir));
     }
 
     // Git clone
     private function link()
     {
         $this->consoleH2($this->output, sprintf('Création du symlink "%s"', $this->site_key));
-        $this->symlink(sprintf($this->paths['WP_DEPLOY_SITE_DIR'], $this->core_key, $this->site_key), sprintf($this->paths['WP_SITE_DIR'], $this->core_key, $this->site_key));
-        $this->consoleExec($this->output, sprintf($this->site_key . ' (%s)', sprintf($this->paths['WP_SITE_DIR'], $this->core_key, $this->site_key)));
+        $this->symlink($this->clone_site_dir, sprintf($this->paths['WP_SITE_DIR'], $this->core_key, $this->site_key));
+        $this->consoleExec($this->output, sprintf($this->site_key . ' (%s > %s)', $this->clone_site_dir, sprintf($this->paths['WP_SITE_DIR'], $this->core_key, $this->site_key)));
     }
 
     // WP Env file
@@ -250,14 +251,15 @@ class Site extends WoodyCommand
     private function woody_assets()
     {
         $this->consoleH2($this->output, 'Compilation des Assets');
-        if($this->core_key == 'woody_02') {
+        $core_path = sprintf($this->paths['WP_CORE_PATH'], $this->core_key);
+        if(file_exists($core_path . '/build.mjs')) {
             $cmd = 'yarn build -s ' . $this->site_key . ' -e ' . $this->env;
             $this->consoleExec($this->output, $cmd);
-            $this->execIn(sprintf($this->core_path, $this->core_key), $cmd);
+            $this->execIn($core_path, $cmd);
         } else {
             $cmd = 'yarn build --site ' . $this->site_key . ' --env ' . $this->env;
             $this->consoleExec($this->output, $cmd);
-            $this->execIn(sprintf($this->core_path, $this->core_key) . '/gulp', $cmd);
+            $this->execIn($core_path . '/gulp', $cmd);
         }
     }
 

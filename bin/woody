@@ -35,7 +35,6 @@ $vendorDir = preg_replace('/releases\\/[0-9]*/', 'current', $vendorDir);
 $vendorDir = str_replace('shared', 'current', $vendorDir);
 define('WP_VENDOR_DIR', $vendorDir);
 define('WP_ROOT_DIR', dirname(WP_VENDOR_DIR));
-define('WP_DEPLOY_DIR', dirname(WP_ROOT_DIR));
 
 // PHP Error
 error_reporting(-1);

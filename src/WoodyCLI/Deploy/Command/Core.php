@@ -61,16 +61,8 @@ class Core extends WoodyCommand
                 continue;
             }
 
-            $this->symlink(sprintf('/home/admin/www/themes/%s/current', $site_key), sprintf($this->paths['WP_SITE_DIR'], $core_key, $site_key));
+            $this->symlink(sprintf($this->paths['WP_THEMES_PATH'], $site_key), sprintf($this->paths['WP_SITE_DIR'], $core_key, $site_key));
             $this->consoleExec($this->output, sprintf('%s : %s (%s > %s)', $core_key, $site_key, sprintf('/home/admin/www/themes/%s/current', $site_key), sprintf($this->paths['WP_SITE_DIR'], $core_key, $site_key)));
         }
-
-        // // Sur le dev, il faut relier les confs qui sont normalement lier par Capistrano
-        // if ($this->env == 'dev') {
-        //     $config_dirs = WP_ROOT_DIR . '/config/sites'; //TODO: use other than config_dirs and WP_DEPLOY_DIR
-        //     $this->consoleH2($this->output, 'Installation du symlink de config');
-        //     $this->symlink(WP_DEPLOY_DIR . '/shared/config/sites', $config_dirs);
-        //     $this->consoleExec($this->output, sprintf('%s >> %s', WP_DEPLOY_DIR . '/shared/config/sites', $config_dirs));
-        // }
     }
 }

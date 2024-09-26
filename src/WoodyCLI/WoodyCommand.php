@@ -38,19 +38,28 @@ abstract class WoodyCommand extends AbstractCommand
         parent::__construct($name);
         $this->fs = new Filesystem();
 
-        // On récupère le chemin du core et on le remplace par une chaine avec %s à la place du core_key
+        // Si CLI est dans woody_status, on est en multicore
+        $this->multicore = (strpos(WP_ROOT_DIR, 'woody_status') !== false);
+
+        // On essaye de trouver le core_path en fonction du chemin
         $root_dir = explode('/', WP_ROOT_DIR);
         if (count($root_dir) >= 2) {
             end($root_dir);
-            $this->core_path = str_replace(prev($root_dir), '%s', WP_ROOT_DIR);
+            if($this->multicore) {
+                // On obtient un chemin du type /home/admin/www/%s/current
+                $core_path = str_replace(prev($root_dir), '%s', WP_ROOT_DIR);
+            } else {
+                $this->core_key = prev($root_dir);
+                $core_path = WP_ROOT_DIR;
+            }
         }
 
-        $this->multicore = (strpos(WP_ROOT_DIR, 'woody_status') !== false);
         $this->paths = [
-            'WP_SITE_DIR' => $this->core_path . '/web/app/themes/%s',
-            'WP_SITE_UPLOADS_DIR' => $this->core_path . '/web/app/uploads/%s',
-            'WP_DEPLOY_SITE_DIR' => WP_DEPLOY_DIR . '/sites/%s/current',
-            'WP_SITE_CLI_DIR' => $this->core_path . '/web/app/themes/%s/cli',
+            'WP_CORE_PATH' => $core_path,
+            'WP_THEMES_PATH' => str_replace('%s', 'themes/%s', $core_path), // /home/admin/www/themes/%s/current
+            'WP_SITE_DIR' => $core_path . '/web/app/themes/%s', // /home/admin/www/%s/current/web/app/themes/%s
+            'WP_SITE_UPLOADS_DIR' => $core_path . '/web/app/uploads/%s', // /home/admin/www/%s/current/web/app/uploads/%s
+            'WP_SITE_CLI_DIR' => $core_path . '/web/app/themes/%s/cli', // /home/admin/www/%s/current/web/app/themes/%s/cli
         ];
     }
 
@@ -325,7 +334,7 @@ abstract class WoodyCommand extends AbstractCommand
     protected function wp($command, $exit_on_fail = true)
     {
         try {
-            $callback = $this->execIn(sprintf($this->core_path, $this->core_key), sprintf('WP_SITE_KEY=%s ./bin/wp %s --allow-root', $this->site_key, $command));
+            $callback = $this->execIn(sprintf($this->paths['WP_CORE_PATH'], $this->core_key), sprintf('WP_SITE_KEY=%s ./bin/wp %s --allow-root', $this->site_key, $command));
             return $callback;
         } catch (\Exception $exception) {
             if ($exit_on_fail) {
