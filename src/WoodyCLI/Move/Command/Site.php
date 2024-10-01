@@ -59,7 +59,19 @@ class Site extends WoodyCommand
         $this->setSiteKey($input->getOption('site'));
         $this->sites = $this->loadSites();
 
-        $this->consoleH1($this->output, sprintf('Projet "%s" fermé', $this->site_key));
+        // str_replace de woody_01 par woody_02 dans la conf nginx
+        // /etc/nginx/sites-enabled
+        // sudo service nginx reload
+
+        // Déplacer le .env entre les cores (ex: /home/admin/woody_01/current/config/sites/woody-sandbox/.env)
+
+        // Modifier le cron dans (ex: /etc/cron.d/wp_woody-sandbox)
+
+        // Creer le symlink du theme dans le nouveau core
+
+        // Modifier le yaml dans /home/admin/www/woody_status/config/woody_01.yml
+
+        // N'oubliez pas de répercuter ça dans puppet
 
         return WoodyCommand::SUCCESS;
     }
