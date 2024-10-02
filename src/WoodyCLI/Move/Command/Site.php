@@ -26,12 +26,6 @@ class Site extends WoodyCommand
 
     protected $output;
 
-    protected $is_exist;
-
-    protected $is_install;
-
-    protected $is_cloned;
-
     protected $site_config;
 
     protected $current_core_key;
@@ -79,7 +73,7 @@ class Site extends WoodyCommand
         $this->setTargetCore($input->getOption('core'));
 
         $this->consoleH1($this->output, sprintf("Déplacement du site '%s' du core '%s' vers le core '%s'", $this->site_key, $this->current_core_key, $this->target_core_key));
-        $this->consoleH3($this->output, 'Note : si une erreur survient au cours de ce processus et que le serveur se retrouve dans un état non souhaité, vous pouvez relancer un puppet_apply pour le remettre dans son état initial.');
+        $this->consoleH3($this->output, 'Note : si une erreur survient au cours de ce processus et que le serveur se retrouve dans un état non souhaité, vous pouvez lancer `puppet_apply` pour le remettre dans son état initial.');
 
         $helper = $this->getHelper('question');
         $question = new ConfirmationQuestion('Voulez-vous vraiment déplacer ce site (n/Y) ? ', true);
@@ -109,7 +103,7 @@ class Site extends WoodyCommand
         $this->deploy_site();
 
         $this->consoleH1($this->output, sprintf("Déplacement du site '%s' du core '%s' vers le core '%s' terminé", $this->site_key, $this->current_core_key, $this->target_core_key));
-        $this->consoleH2($this->output, 'IMPORTANT : Pour que ce déplacement soit persistant, vous devez modifier la configuration de Puppet');
+        $this->consoleH2($this->output, 'IMPORTANT : Pour que ce déplacement soit persistant, vous devez modifier la configuration Puppet');
 
         return WoodyCommand::SUCCESS;
     }
