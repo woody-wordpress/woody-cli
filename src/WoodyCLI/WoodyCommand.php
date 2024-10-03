@@ -56,6 +56,7 @@ abstract class WoodyCommand extends AbstractCommand
 
         $this->paths = [
             'WP_CORE_PATH' => $core_path,
+            'WP_CORES_PATH' => dirname(dirname(WP_ROOT_DIR)), // /home/admin/www
             'WP_THEMES_PATH' => str_replace('%s', 'themes/%s', $core_path), // /home/admin/www/themes/%s/current
             'WP_SITE_DIR' => $core_path . '/web/app/themes/%s', // /home/admin/www/%s/current/web/app/themes/%s
             'WP_SITE_UPLOADS_DIR' => $core_path . '/web/app/uploads/%s', // /home/admin/www/%s/current/web/app/uploads/%s
