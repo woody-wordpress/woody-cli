@@ -81,26 +81,34 @@ class Site extends WoodyCommand
             return WoodyCommand::SUCCESS;
         }
 
-        $this->consoleH2($this->output, 'Changement de la configuration nginx');
+        $this->consoleText($this->output, 'Changement de la configuration nginx');
         $this->change_nginx();
 
-        $this->consoleH2($this->output, 'Modification des crons');
+        $this->consoleText($this->output, 'Modification des crons');
         $this->change_cron();
 
-        $this->consoleH2($this->output, 'Déplacement de la configuration du site');
+        $this->consoleText($this->output, 'Déplacement de la configuration du site');
         $this->move_site_config();
 
-        $this->consoleH2($this->output, 'Déplacement du thème dans le nouveau core');
+        $this->consoleText($this->output, 'Déplacement du thème dans le nouveau core');
         $this->move_site_theme();
 
-        $this->consoleH2($this->output, 'Changement de la configuration woody_status');
+        if ($this->env == "dev") {
+            $this->consoleText($this->output, 'Déplacement des uploads dans le nouveau core (dev only)');
+            $this->move_site_uploads();
+        }
+
+        $this->consoleText($this->output, 'Changement de la configuration woody_status');
         $this->change_woody_status_config();
 
-        $this->consoleH2($this->output, 'Mise à jour du site');
+        $this->consoleText($this->output, 'Mise à jour du site');
         $this->deploy_site();
 
-        $this->consoleH2($this->output, 'Nginx service reload');
-        $this->reload_nginx();
+        $this->consoleText($this->output, 'Php service reload');
+        $this->php_reload();
+
+        $this->consoleText($this->output, 'Nginx service reload');
+        $this->nginx_reload();
 
         $this->consoleH1($this->output, sprintf("Déplacement du site '%s' du core '%s' vers le core '%s' terminé", $this->site_key, $this->current_core_key, $this->target_core_key));
         $this->consoleH2($this->output, 'IMPORTANT : Pour que ce déplacement soit persistant, vous devez modifier la configuration Puppet');
@@ -194,7 +202,6 @@ class Site extends WoodyCommand
         }
         $target_config_dir = sprintf('%s/config/sites', $this->target_core_path);
         $target_config_site_dir = sprintf('%s/%s', $target_config_dir, $this->site_key);
-        $this->consoleH3($this->output, sprintf("'%s' est-il déjà existant ?", $target_config_site_dir));
         if ($this->fs->exists($target_config_site_dir)) {
             $this->consoleH3($this->output, sprintf("Avertissement : le dossier de configuration '%s' déjà existant a été préservé - la configuration n'est pas déplacée.", $target_config_site_dir));
             return;
@@ -238,6 +245,29 @@ class Site extends WoodyCommand
     }
 
     /**
+     * Move site uploads into targeted core
+     */
+    protected function move_site_uploads() {
+        $current_uploads_dir = sprintf('%s/web/app/uploads/%s', $this->current_core_path, $this->site_key);
+        if (!$this->fs->exists($current_uploads_dir)) {
+            $this->consoleH3($this->output, sprintf("Avertissement : aucun dossier d'uploads trouvé à l'emplacement '%s'", $current_uploads_dir));
+            return;
+        }
+
+        $target_uploads_dir = sprintf('%s/web/app/uploads/%s', $this->target_core_path, $this->site_key);
+        if ($this->fs->exists($target_uploads_dir)) {
+            $cmd = sprintf("sudo rm -rf %s", $target_uploads_dir);
+            $this->consoleExec($this->output, $cmd);
+            $this->exec($cmd);
+            $this->consoleH3($this->output, sprintf("Avertissement : le dossier d'uploads trouvé dans le core cible à l'emplacement '%s', a été supprimé.", $target_uploads_dir));
+        }
+
+        $cmd = sprintf("sudo mv %s %s", $current_uploads_dir, $target_uploads_dir);
+        $this->consoleExec($this->output, $cmd);
+        $this->exec($cmd);
+    }
+
+    /**
      * Change woody_status config
      */
     protected function change_woody_status_config() {
@@ -267,12 +297,17 @@ class Site extends WoodyCommand
     /**
      * Reload nginx to get new configuration
      */
-    protected function reload_nginx() {
-        if ($this->env == "dev") {
-            $cmd = 'sudo service nginx restart';
-        } else {
-            $cmd = 'sudo service nginx reload';
-        }
+    protected function php_reload() {
+        $cmd = 'sudo service php7.4-fpm reload';
+        $this->consoleExec($this->output, $cmd);
+        $this->exec($cmd);
+    }
+
+    /**
+     * Reload nginx to get new configuration
+     */
+    protected function nginx_reload() {
+        $cmd = 'sudo service nginx reload';
         $this->consoleExec($this->output, $cmd);
         $this->exec($cmd);
     }
