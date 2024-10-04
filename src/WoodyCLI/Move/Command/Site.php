@@ -96,11 +96,11 @@ class Site extends WoodyCommand
         $this->consoleH2($this->output, 'Changement de la configuration woody_status');
         $this->change_woody_status_config();
 
-        $this->consoleH2($this->output, 'Nginx service reload');
-        $this->reload_nginx();
-
         $this->consoleH2($this->output, 'Mise à jour du site');
         $this->deploy_site();
+
+        $this->consoleH2($this->output, 'Nginx service reload');
+        $this->reload_nginx();
 
         $this->consoleH1($this->output, sprintf("Déplacement du site '%s' du core '%s' vers le core '%s' terminé", $this->site_key, $this->current_core_key, $this->target_core_key));
         $this->consoleH2($this->output, 'IMPORTANT : Pour que ce déplacement soit persistant, vous devez modifier la configuration Puppet');
@@ -268,7 +268,11 @@ class Site extends WoodyCommand
      * Reload nginx to get new configuration
      */
     protected function reload_nginx() {
-        $cmd = 'sudo service nginx reload';
+        if ($this->env == "dev") {
+            $cmd = 'sudo service nginx restart';
+        } else {
+            $cmd = 'sudo service nginx reload';
+        }
         $this->consoleExec($this->output, $cmd);
         $this->exec($cmd);
     }
