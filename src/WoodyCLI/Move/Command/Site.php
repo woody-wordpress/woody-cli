@@ -81,33 +81,33 @@ class Site extends WoodyCommand
             return WoodyCommand::SUCCESS;
         }
 
-        $this->consoleText($this->output, 'Changement de la configuration nginx');
+        $this->consoleH2($this->output, 'Changement de la configuration nginx');
         $this->change_nginx();
 
-        $this->consoleText($this->output, 'Modification des crons');
+        $this->consoleH2($this->output, 'Modification des crons');
         $this->change_cron();
 
-        $this->consoleText($this->output, 'Déplacement de la configuration du site');
+        $this->consoleH2($this->output, 'Déplacement de la configuration du site');
         $this->move_site_config();
 
-        $this->consoleText($this->output, 'Déplacement du thème dans le nouveau core');
+        $this->consoleH2($this->output, 'Déplacement du thème dans le nouveau core');
         $this->move_site_theme();
 
         if ($this->env == "dev") {
-            $this->consoleText($this->output, 'Déplacement des uploads dans le nouveau core (dev only)');
+            $this->consoleH2($this->output, 'Déplacement des uploads dans le nouveau core (dev only)');
             $this->move_site_uploads();
         }
 
-        $this->consoleText($this->output, 'Changement de la configuration woody_status');
+        $this->consoleH2($this->output, 'Changement de la configuration woody_status');
         $this->change_woody_status_config();
 
-        $this->consoleText($this->output, 'Mise à jour du site');
+        $this->consoleH2($this->output, 'Mise à jour du site');
         $this->deploy_site();
 
-        $this->consoleText($this->output, 'Php service reload');
+        $this->consoleH2($this->output, 'Php service reload');
         $this->php_reload();
 
-        $this->consoleText($this->output, 'Nginx service reload');
+        $this->consoleH2($this->output, 'Nginx service reload');
         $this->nginx_reload();
 
         $this->consoleH1($this->output, sprintf("Déplacement du site '%s' du core '%s' vers le core '%s' terminé", $this->site_key, $this->current_core_key, $this->target_core_key));
@@ -146,17 +146,17 @@ class Site extends WoodyCommand
         }
         foreach ($finder as $path => $finder_file) {
             $new_path = str_replace($this->current_core_key, $this->target_core_key, $path);
-            $this->consoleH3($this->output, "renommage du fichier");
+            $this->consoleText($this->output, "renommage du fichier");
             $cmd = sprintf("sudo mv %s %s", $path, $new_path);
             $this->consoleExec($this->output, $cmd);
             $this->exec($cmd);
 
-            $this->consoleH3($this->output, "mise à jour de la configuration");
+            $this->consoleText($this->output, "mise à jour de la configuration");
             $cmd = sprintf("sudo sed -i 's/%s/%s/g' %s", preg_quote($this->current_core_key), preg_quote($this->target_core_key), $new_path);
             $this->consoleExec($this->output, $cmd);
             $this->exec($cmd);
 
-            $this->consoleH3($this->output, "mise à jour du symlink");
+            $this->consoleText($this->output, "mise à jour du symlink");
             $symlink_path = str_replace('/etc/nginx/sites-available/', '/etc/nginx/sites-enabled/', $path);
             $cmd = sprintf("sudo rm -f %s", $symlink_path);
             $this->consoleExec($this->output, $cmd);
@@ -168,7 +168,7 @@ class Site extends WoodyCommand
 
             $target_core_nginx_log_path = sprintf("/var/log/nginx/%s/%s", $this->target_core_key, $this->site_key);
             if (!$this->fs->exists($target_core_nginx_log_path)) {
-                $this->consoleH3($this->output, "création du dossier de log");
+                $this->consoleText($this->output, "création du dossier de log");
                 $cmd = sprintf("sudo mkdir -p %s", $target_core_nginx_log_path);
                 $this->consoleExec($this->output, $cmd);
                 $this->exec($cmd);
@@ -176,7 +176,7 @@ class Site extends WoodyCommand
 
             $target_core_nginx_access_log_path = sprintf("%s/access.log", $target_core_nginx_log_path);
             if (!$this->fs->exists($target_core_nginx_access_log_path)) {
-                $this->consoleH3($this->output, "création du access.log");
+                $this->consoleText($this->output, "création du access.log");
                 $cmd = sprintf("sudo touch %s", $target_core_nginx_access_log_path);
                 $this->consoleExec($this->output, $cmd);
                 $this->exec($cmd);
@@ -184,7 +184,7 @@ class Site extends WoodyCommand
 
             $target_core_nginx_error_log_path = sprintf("%s/error.log", $target_core_nginx_log_path);
             if (!$this->fs->exists($target_core_nginx_error_log_path)) {
-                $this->consoleH3($this->output, "création du error.log");
+                $this->consoleText($this->output, "création du error.log");
                 $cmd = sprintf("sudo touch %s", $target_core_nginx_error_log_path);
                 $this->consoleExec($this->output, $cmd);
                 $this->exec($cmd);
@@ -273,7 +273,7 @@ class Site extends WoodyCommand
     protected function change_woody_status_config() {
 
         $current_core_yml_path = sprintf('/home/admin/www/woody_status/shared/config/%s.yml', $this->current_core_key);
-        $this->consoleH3($this->output, sprintf("retrait du site de la configuration '%s'", $current_core_yml_path));
+        $this->consoleText($this->output, sprintf("retrait du site de la configuration '%s'", $current_core_yml_path));
         if ($this->fs->exists($current_core_yml_path)) {
             $current_core_config = Yaml::parseFile($current_core_yml_path);
             unset($current_core_config['sites'][array_search($this->site_key, $current_core_config['sites'])]);
@@ -283,7 +283,7 @@ class Site extends WoodyCommand
         }
 
         $target_core_yml_path = sprintf('/home/admin/www/woody_status/shared/config/%s.yml', $this->target_core_key);
-        $this->consoleH3($this->output, sprintf("ajout du site à la configuration '%s'", $target_core_yml_path));
+        $this->consoleText($this->output, sprintf("ajout du site à la configuration '%s'", $target_core_yml_path));
         if ($this->fs->exists($target_core_yml_path)) {
             $target_core_config = Yaml::parseFile($target_core_yml_path);
             $target_core_config['sites'][] = $this->site_key;
