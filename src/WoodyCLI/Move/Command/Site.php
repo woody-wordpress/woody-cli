@@ -307,11 +307,8 @@ class Site extends WoodyCommand
      * Reload nginx to get new configuration
      */
     protected function nginx_reload() {
-        if ($this->env != 'prod') {
-            $cmd = 'sudo service nginx reload';
-        } else {
-            $cmd = 'sudo service nginx restart';
-        }
+        // NOTE : 'restart' plutôt que 'reload' est nécessaire car l'ancienne configuration nginx est supprimée de site-availables/ et nginx reload ne regarde pas les suppressions de conf (qu'il garde en cache)
+        $cmd = 'sudo service nginx restart';
         $this->consoleExec($this->output, $cmd);
         $this->exec($cmd);
     }
