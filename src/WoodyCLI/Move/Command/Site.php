@@ -317,7 +317,7 @@ class Site extends WoodyCommand
      * Update site into his new core
      */
     protected function deploy_site() {
-        $cmd = sprintf('woody deploy:site -s %s', $this->site_key);
+        $cmd = sprintf('woody deploy:site -s %s -e %s', $this->site_key, $this->env);
         $this->consoleExec($this->output, $cmd);
         $this->exec($cmd);
     }
