@@ -140,7 +140,7 @@ class Site extends WoodyCommand
      */
     protected function change_nginx() {
         $finder = new Finder();
-        $finder->in('/etc/nginx/sites-available/')->depth(0)->files()->name(sprintf('/\d\d_%s_%s(.+?|)\.conf/', preg_quote($this->current_core_key), preg_quote($this->site_key)))->sortByName();
+        $finder->in('/etc/nginx/sites-available/')->depth(0)->files()->name(sprintf('/\d\d_%s_%s(_.+?|)\.conf/', preg_quote($this->current_core_key), preg_quote($this->site_key)))->sortByName();
         if (!$finder->hasResults()) {
             throw new \RuntimeException('Configuration nginx du site introuvable');
         }
