@@ -7,7 +7,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
@@ -71,11 +70,8 @@ class Site extends WoodyCommand
 
         $this->consoleH1($this->output, sprintf("Pull du site '%s' du core '%s' depuis la branche '%s'", $this->site_key, $this->current_core_key, $this->git_branch));
 
-        $helper = $this->getHelper('question');
-        $question = new ConfirmationQuestion('Voulez-vous vraiment puller ce site (n/Y) ? ', true);
-        if (!$helper->ask($input, $output, $question)) {
-            return WoodyCommand::SUCCESS;
-        }
+        $this->consoleH2($this->output, 'Git checkout');
+        $this->checkout_branch();
 
         $this->consoleH2($this->output, 'Pull du site');
         $this->pull_site();
@@ -86,13 +82,21 @@ class Site extends WoodyCommand
     }
 
     /**
+     * Checkouts Git branch
+     */
+    protected function checkout_branch() {
+        $theme_folder = sprintf('%s/web/app/themes/%s', $this->current_core_path, $this->site_key);
+        $cmd = sprintf('git checkout %s --track origin/%s', $this->git_branch);
+        $this->consoleExec($this->output, $cmd);
+        $this->execIn($theme_folder, $cmd);
+    }
+
+    /**
      * Pulls site
      */
     protected function pull_site() {
-        $folder = sprintf('%s/web/app/themes/%s', $this->current_core_path, $this->site_key);
-
-        $cmd = sprintf('git pull origin %s', $this->git_branch);
+        $cmd = 'git pull';
         $this->consoleExec($this->output, $cmd);
-        $this->execIn($folder, $cmd);
+        $this->exec($cmd);
     }
 }
