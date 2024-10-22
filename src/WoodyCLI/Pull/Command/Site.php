@@ -30,6 +30,8 @@ class Site extends WoodyCommand
 
     protected $current_core_path;
 
+    protected $git_branch;
+
     /**
      * {inheritdoc}
      */
@@ -64,8 +66,9 @@ class Site extends WoodyCommand
         }
         $this->current_core_key = $this->site_config['core']['key'];
         $this->current_core_path = $this->site_config['core']['path'];
+        $this->git_branch = $input->getOption('branch');
 
-        $this->consoleH1($this->output, sprintf("Pull du site '%s' du core '%s'", $this->site_key, $this->current_core_key));
+        $this->consoleH1($this->output, sprintf("Pull du site '%s' du core '%s' depuis la branche '%s'", $this->site_key, $this->current_core_key, $this->git_branch));
 
         $helper = $this->getHelper('question');
         $question = new ConfirmationQuestion('Voulez-vous vraiment puller ce site (n/Y) ? ', true);
@@ -76,7 +79,7 @@ class Site extends WoodyCommand
         $this->consoleH2($this->output, 'Pull du site');
         $this->pull_site();
 
-        $this->consoleH1($this->output, sprintf("Pull du site '%s' du core '%s' terminé", $this->site_key, $this->current_core_key));
+        $this->consoleH1($this->output, sprintf("Pull du site '%s' du core '%s' depuis la branche '%s' terminé", $this->site_key, $this->current_core_key, $this->git_branch));
 
         return WoodyCommand::SUCCESS;
     }
