@@ -95,8 +95,9 @@ class Site extends WoodyCommand
      * Pulls site
      */
     protected function pull_site() {
+        $theme_folder = sprintf('%s/web/app/themes/%s', $this->current_core_path, $this->site_key);
         $cmd = 'git pull';
         $this->consoleExec($this->output, $cmd);
-        $this->exec($cmd);
+        $this->execIn($theme_folder, $cmd);
     }
 }
