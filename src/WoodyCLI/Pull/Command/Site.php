@@ -86,7 +86,7 @@ class Site extends WoodyCommand
      */
     protected function checkout_branch() {
         $theme_folder = sprintf('%s/web/app/themes/%s', $this->current_core_path, $this->site_key);
-        $cmd = sprintf('git checkout %s --track origin/%s', $this->git_branch, $this->git_branch);
+        $cmd = sprintf('git checkout -B %s --track origin/%s', $this->git_branch, $this->git_branch);
         $this->consoleExec($this->output, $cmd);
         $this->execIn($theme_folder, $cmd);
     }
