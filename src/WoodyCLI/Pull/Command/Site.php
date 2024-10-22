@@ -64,6 +64,10 @@ class Site extends WoodyCommand
         if (!array_key_exists('core', $this->site_config) || !array_key_exists('key', $this->site_config['core']) || !array_key_exists('path', $this->site_config['core'])) {
             throw new \RuntimeException('Configuration core manquante');
         }
+
+        if (!array_key_exists('WP_GIT_REPOSITORY', $this->site_config)) {
+            throw new \RuntimeException('Aucun dépôt Git trouvé pour ce site');
+        }
         $this->current_core_key = $this->site_config['core']['key'];
         $this->current_core_path = $this->site_config['core']['path'];
         $this->git_branch = $input->getOption('branch');
@@ -88,8 +92,13 @@ class Site extends WoodyCommand
      * Pulls site
      */
     protected function pull_site() {
-        $cmd = 'pwd';
+        $site_repository = $this->site_config['WP_GIT_REPOSITORY'];
+        $this->consoleH3($site_repository, 'Url du dépôt Git');
+
+        $folder = sprintf('%s/web/app/themes/%s', $this->current_core_path, $this->site_key);
+
+        $cmd = sprintf('git pull origin %s', $this->git_branch);
         $this->consoleExec($this->output, $cmd);
-        $this->exec($cmd);
+        $this->execIn($folder, $cmd);
     }
 }
