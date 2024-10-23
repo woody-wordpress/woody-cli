@@ -82,6 +82,8 @@ class Site extends WoodyCommand
             return WoodyCommand::SUCCESS;
         }
 
+        $this->woody_maintenance_on();
+
         $this->consoleH2($this->output, 'Changement de la configuration nginx');
         $this->change_nginx();
 

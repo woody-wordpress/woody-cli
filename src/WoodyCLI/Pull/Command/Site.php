@@ -25,9 +25,11 @@ class Site extends WoodyCommand
 
     protected $site_config;
 
-    protected $current_core_key;
+    protected $theme_current_path;
 
-    protected $current_core_path;
+    protected $theme_repo_path;
+
+    protected $theme_release_path;
 
     protected $git_branch;
 
@@ -41,7 +43,6 @@ class Site extends WoodyCommand
             ->setDescription('Fait un git pull sur un site')
             // Options
             ->addOption('site', 's', InputOption::VALUE_REQUIRED, 'Site Key')
-            ->addOption('core', 'c', InputOption::VALUE_REQUIRED, 'Core Key')
             ->addOption('env', 'e', InputOption::VALUE_OPTIONAL, 'Environnement', 'dev')
             ->addOption('branch', 'b', InputOption::VALUE_OPTIONAL, 'Branch', 'master');
     }
@@ -56,51 +57,86 @@ class Site extends WoodyCommand
 
         $this->setEnv($input->getOption('env'));
         $this->setSiteKey($input->getOption('site'));
-        $this->setCoreKey($input->getOption('core'));
+        $this->git_branch = $input->getOption('branch');
+
+        if($this->env == 'dev') {
+            $this->consoleH1($this->output, 'Cette commande ne se lance pas en dev');
+            return WoodyCommand::SUCCESS;
+        }
 
         // NOTE $this->setSiteKey() runs $this->loadSites() and verifies $this->siteIsConfigured($site_key)
         $this->site_config = $this->sites[$this->site_key];
-
-        if (!array_key_exists('core', $this->site_config) || !array_key_exists('key', $this->site_config['core']) || !array_key_exists('path', $this->site_config['core'])) {
-            throw new \RuntimeException('Configuration core manquante');
-        }
-
-        $this->current_core_key = $this->site_config['core']['key'];
+        $this->setCoreKey($this->site_config['core']['key']);
         $this->current_core_path = $this->site_config['core']['path'];
-        $this->git_branch = $input->getOption('branch');
 
-        $this->consoleH1($this->output, sprintf("Pull du site '%s' du core '%s' depuis la branche '%s'", $this->site_key, $this->current_core_key, $this->git_branch));
+        $this->theme_current_path = sprintf($this->paths['WP_THEMES_PATH'], $this->site_key);
+        $this->theme_repo_path = str_replace('current', 'repo', $this->theme_current_path);
+        $this->theme_release_path = str_replace('current', 'releases', $this->theme_current_path) . '/' . date('YmdHis');
 
-        $this->consoleH2($this->output, 'Git checkout');
+        $this->consoleH1($this->output, sprintf("Pull du site '%s' du core '%s' depuis la branche '%s'", $this->site_key, $this->core_key, $this->git_branch));
+        $this->woody_maintenance_on();
         $this->checkout_branch();
-
-        $this->consoleH2($this->output, 'Pull du site');
         $this->pull_site();
-
-        $this->consoleH1($this->output, sprintf("Pull du site '%s' du core '%s' depuis la branche '%s' terminé", $this->site_key, $this->current_core_key, $this->git_branch));
+        $this->reset_site();
+        $this->create_release();
+        $this->symlink_current();
+        $this->woody_maintenance_off();
 
         return WoodyCommand::SUCCESS;
     }
 
     /**
-     * Checkouts Git branch
+     * Checkout Git branch
      */
     protected function checkout_branch()
     {
-        $theme_folder = sprintf('%s/web/app/themes/%s', $this->current_core_path, $this->site_key);
+        $this->consoleH2($this->output, 'Git checkout');
         $cmd = sprintf('git checkout -B %s --track origin/%s', $this->git_branch, $this->git_branch);
         $this->consoleExec($this->output, $cmd);
-        $this->execIn($theme_folder, $cmd);
+        $this->execIn($this->theme_repo_path, $cmd);
     }
 
     /**
-     * Pulls site
+     * Pull site
      */
     protected function pull_site()
     {
-        $theme_folder = sprintf('%s/web/app/themes/%s', $this->current_core_path, $this->site_key);
+        $this->consoleH2($this->output, 'Pull du site');
         $cmd = 'git pull';
         $this->consoleExec($this->output, $cmd);
-        $this->execIn($theme_folder, $cmd);
+        $this->execIn($this->theme_repo_path, $cmd);
+    }
+
+    /**
+     * Reset site
+     */
+    protected function reset_site()
+    {
+        $this->consoleH2($this->output, 'Reset du site');
+        $cmd = 'git reset --hard';
+        $this->consoleExec($this->output, $cmd);
+        $this->execIn($this->theme_repo_path, $cmd);
+    }
+
+    /**
+     * Create release
+     */
+    protected function create_release()
+    {
+        $this->consoleH2($this->output, 'Create release');
+        $cmd = sprintf('rsync -ar --exclude=.git* %s/ %s', $this->theme_repo_path, $this->theme_release_path);
+        $this->consoleExec($this->output, $cmd);
+        $this->execIn($this->theme_repo_path, $cmd);
+    }
+
+    /**
+     * Symlink current
+     */
+    protected function symlink_current()
+    {
+        $this->consoleH2($this->output, 'Symlink current');
+        $cmd = sprintf('rm -rf %s && ln -s %s %s', $this->theme_current_path, $this->theme_release_path, $this->theme_current_path);
+        $this->consoleExec($this->output, $cmd);
+        $this->execIn($this->theme_repo_path, $cmd);
     }
 }
