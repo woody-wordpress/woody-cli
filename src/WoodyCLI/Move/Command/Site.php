@@ -82,8 +82,6 @@ class Site extends WoodyCommand
             return WoodyCommand::SUCCESS;
         }
 
-        $this->woody_maintenance_on();
-
         $this->consoleH2($this->output, 'Changement de la configuration nginx');
         $this->change_nginx();
 
@@ -95,6 +93,8 @@ class Site extends WoodyCommand
 
         $this->consoleH2($this->output, 'Déplacement du thème dans le nouveau core');
         $this->move_site_theme();
+
+        $this->woody_maintenance_on();
 
         if ($this->env == "dev") {
             $this->consoleH2($this->output, 'Déplacement des uploads dans le nouveau core (dev only)');

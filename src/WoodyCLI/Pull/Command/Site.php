@@ -44,6 +44,7 @@ class Site extends WoodyCommand
             // Options
             ->addOption('site', 's', InputOption::VALUE_REQUIRED, 'Site Key')
             ->addOption('env', 'e', InputOption::VALUE_OPTIONAL, 'Environnement', 'dev')
+            ->addOption('move', 'm', InputOption::VALUE_OPTIONAL, 'Move', false)
             ->addOption('branch', 'b', InputOption::VALUE_OPTIONAL, 'Branch', 'master');
     }
 
@@ -80,7 +81,10 @@ class Site extends WoodyCommand
         $this->reset_site();
         $this->create_release();
         $this->symlink_current();
-        $this->woody_maintenance_off();
+
+        if($input->getOption('move') == false) {
+            $this->woody_maintenance_off();
+        }
 
         return WoodyCommand::SUCCESS;
     }
