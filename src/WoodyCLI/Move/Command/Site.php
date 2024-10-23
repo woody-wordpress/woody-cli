@@ -111,7 +111,7 @@ class Site extends WoodyCommand
         $this->consoleH2($this->output, 'Nginx service reload');
         $this->nginx_reload();
 
-        if($input->getOption('deploy') == true) {
+        if($input->getOption('deploy')) {
             $this->consoleH2($this->output, 'Mise à jour du site');
             $this->deploy_site();
         }
