@@ -97,10 +97,10 @@ class Site extends WoodyCommand
 
         $this->woody_maintenance_on();
 
-        if ($this->env == "dev") {
-            $this->consoleH2($this->output, 'Déplacement des uploads dans le nouveau core (dev only)');
-            $this->move_site_uploads();
-        }
+        // if ($this->env == "dev") {
+        //     $this->consoleH2($this->output, 'Déplacement des uploads dans le nouveau core (dev only)');
+        //     $this->move_site_uploads();
+        // }
 
         $this->consoleH2($this->output, 'Changement de la configuration woody_status');
         $this->change_woody_status_config();
