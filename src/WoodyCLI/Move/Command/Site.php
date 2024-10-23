@@ -47,7 +47,7 @@ class Site extends WoodyCommand
             // Options
             ->addOption('site', 's', InputOption::VALUE_REQUIRED, 'Site Key')
             ->addOption('core', 'c', InputOption::VALUE_REQUIRED, 'Core Key')
-            ->addOption('deploy', 'd', InputOption::VALUE_OPTIONAL, 'Deploy', true)
+            ->addOption('deploy', 'd', InputOption::VALUE_NONE, 'Deploy')
             ->addOption('env', 'e', InputOption::VALUE_OPTIONAL, 'Environnement', 'dev');
     }
 
