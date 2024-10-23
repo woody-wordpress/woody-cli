@@ -48,7 +48,7 @@ class Site extends WoodyCommand
             ->addOption('site', 's', InputOption::VALUE_REQUIRED, 'Site Key')
             ->addOption('core', 'c', InputOption::VALUE_REQUIRED, 'Core Key')
             ->addOption('deploy', 'd', InputOption::VALUE_NONE, 'Deploy')
-            ->addOption('env', 'e', InputOption::VALUE_OPTIONAL, 'Environnement', 'dev');
+            ->addOption('env', 'e', InputOption::VALUE_OPTIONAL, 'Environnement');
     }
 
     /**
@@ -59,7 +59,12 @@ class Site extends WoodyCommand
         $this->input = $input;
         $this->output = $output;
 
-        $this->setEnv($input->getOption('env'));
+        $env = $input->getOption('env');
+        if (empty($env)) {
+            throw new \RuntimeException('-e environnement manquant');
+        }
+
+        $this->setEnv($env);
         $this->setSiteKey($input->getOption('site'));
         $this->setCoreKey($input->getOption('core'));
 
@@ -97,10 +102,14 @@ class Site extends WoodyCommand
 
         $this->woody_maintenance_on();
 
-        // if ($this->env == "dev") {
-        //     $this->consoleH2($this->output, 'Déplacement des uploads dans le nouveau core (dev only)');
-        //     $this->move_site_uploads();
-        // }
+        if ($this->env == "dev") {
+            $this->consoleH2($this->output, 'Déplacement des uploads dans le nouveau core (dev only)');
+            $helper = $this->getHelper('question');
+            $question = new ConfirmationQuestion('Voulez-vous vraiment déplacer les uploads de ce site - cela doit être fait en dev uniquement (N/y) ? ', false);
+            if (!$helper->ask($input, $output, $question)) {
+                $this->move_site_uploads();
+            }
+        }
 
         $this->consoleH2($this->output, 'Changement de la configuration woody_status');
         $this->change_woody_status_config();
@@ -115,6 +124,8 @@ class Site extends WoodyCommand
             $this->consoleH2($this->output, 'Mise à jour du site');
             $this->deploy_site();
         }
+
+        $this->woody_maintenance_off();
 
         $this->consoleH1($this->output, sprintf("Déplacement du site '%s' du core '%s' vers le core '%s' terminé", $this->site_key, $this->current_core_key, $this->target_core_key));
         $this->consoleH2($this->output, 'IMPORTANT : Pour que ce déplacement soit persistant, vous devez modifier la configuration Puppet');
