@@ -63,6 +63,8 @@ class Restore extends WoodyCommand
         $this->setEnv($input->getOption('env'));
         $this->setSiteKey($input->getOption('site'));
         $this->version = $input->getOption('timestamp');
+        $this->site_config = $this->sites[$this->site_key];
+        $this->setCoreKey($this->site_config['core']['key']);
 
         // Backup path
         $path = $input->getOption('path');
