@@ -47,6 +47,7 @@ class Site extends WoodyCommand
             // Options
             ->addOption('site', 's', InputOption::VALUE_REQUIRED, 'Site Key')
             ->addOption('core', 'c', InputOption::VALUE_REQUIRED, 'Core Key')
+            ->addOption('deploy', 'd', InputOption::VALUE_OPTIONAL, 'Deploy', true)
             ->addOption('env', 'e', InputOption::VALUE_OPTIONAL, 'Environnement', 'dev');
     }
 
@@ -110,8 +111,10 @@ class Site extends WoodyCommand
         $this->consoleH2($this->output, 'Nginx service reload');
         $this->nginx_reload();
 
-        $this->consoleH2($this->output, 'Mise à jour du site');
-        $this->deploy_site();
+        if($input->getOption('deploy') == true) {
+            $this->consoleH2($this->output, 'Mise à jour du site');
+            $this->deploy_site();
+        }
 
         $this->consoleH1($this->output, sprintf("Déplacement du site '%s' du core '%s' vers le core '%s' terminé", $this->site_key, $this->current_core_key, $this->target_core_key));
         $this->consoleH2($this->output, 'IMPORTANT : Pour que ce déplacement soit persistant, vous devez modifier la configuration Puppet');
