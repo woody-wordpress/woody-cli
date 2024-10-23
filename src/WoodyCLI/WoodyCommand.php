@@ -78,6 +78,15 @@ abstract class WoodyCommand extends AbstractCommand
     }
 
     /**
+    * Set the current core_key
+    * @param string $this->core_key
+    */
+    protected function setCoreKey($core_key)
+    {
+        $this->core_key = $core_key;
+    }
+
+    /**
      * Set the current env
      * @param string $this->env
      */

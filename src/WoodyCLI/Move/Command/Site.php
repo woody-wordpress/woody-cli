@@ -60,6 +60,7 @@ class Site extends WoodyCommand
 
         $this->setEnv($input->getOption('env'));
         $this->setSiteKey($input->getOption('site'));
+        $this->setCoreKey($input->getOption('core'));
 
         // NOTE $this->setSiteKey() runs $this->loadSites() and verifies $this->siteIsConfigured($site_key)
         $this->site_config = $this->sites[$this->site_key];
@@ -138,7 +139,8 @@ class Site extends WoodyCommand
     /**
      * Change Nginx config for new targeted core
      */
-    protected function change_nginx() {
+    protected function change_nginx()
+    {
         $finder = new Finder();
         $finder->in('/etc/nginx/sites-available/')->depth(0)->files()->name(sprintf('/\d\d_%s_%s(_.+?|)\.conf/', preg_quote($this->current_core_key), preg_quote($this->site_key)))->sortByName();
         if (!$finder->hasResults()) {
@@ -195,7 +197,8 @@ class Site extends WoodyCommand
     /**
      * Move site config into new targeted core
      */
-    protected function move_site_config() {
+    protected function move_site_config()
+    {
         $current_config_dir = sprintf('%s/config/sites/%s', $this->current_core_path, $this->site_key);
         if (!$this->fs->exists($current_config_dir)) {
             throw new \RuntimeException("Le dossier de configuration du site n'existe pas");
@@ -214,7 +217,8 @@ class Site extends WoodyCommand
     /**
      * Change cron config for new targeted core
      */
-    protected function change_cron() {
+    protected function change_cron()
+    {
         $cron_file = sprintf('/etc/cron.d/wp_%s', $this->site_key);
         if (!$this->fs->exists($cron_file)) {
             $this->consoleH3($this->output, sprintf("Avertissement : la configuration cron '%s' du site n'existe pas", $cron_file));
@@ -228,7 +232,8 @@ class Site extends WoodyCommand
     /**
      * Move site theme into targeted core
      */
-    protected function move_site_theme() {
+    protected function move_site_theme()
+    {
         $cmd = sprintf("sudo rm -f %s/web/app/themes/%s", $this->current_core_path, $this->site_key);
         $this->consoleExec($this->output, $cmd);
         $this->exec($cmd);
@@ -247,7 +252,8 @@ class Site extends WoodyCommand
     /**
      * Move site uploads into targeted core
      */
-    protected function move_site_uploads() {
+    protected function move_site_uploads()
+    {
         $current_uploads_dir = sprintf('%s/web/app/uploads/%s', $this->current_core_path, $this->site_key);
         if (!$this->fs->exists($current_uploads_dir)) {
             $this->consoleH3($this->output, sprintf("Avertissement : aucun dossier d'uploads trouvé à l'emplacement '%s'", $current_uploads_dir));
@@ -270,7 +276,8 @@ class Site extends WoodyCommand
     /**
      * Change woody_status config
      */
-    protected function change_woody_status_config() {
+    protected function change_woody_status_config()
+    {
 
         $current_core_yml_path = sprintf('/home/admin/www/woody_status/shared/config/%s.yml', $this->current_core_key);
         $this->consoleText($this->output, sprintf("retrait du site de la configuration '%s'", $current_core_yml_path));
@@ -297,7 +304,8 @@ class Site extends WoodyCommand
     /**
      * Reload nginx to get new configuration
      */
-    protected function php_reload() {
+    protected function php_reload()
+    {
         $cmd = 'sudo service php7.4-fpm reload';
         $this->consoleExec($this->output, $cmd);
         $this->exec($cmd);
@@ -306,7 +314,8 @@ class Site extends WoodyCommand
     /**
      * Reload nginx to get new configuration
      */
-    protected function nginx_reload() {
+    protected function nginx_reload()
+    {
         // NOTE : 'restart' plutôt que 'reload' est nécessaire car l'ancienne configuration nginx est supprimée de site-availables/ et nginx reload ne regarde pas les suppressions de conf (qu'il garde en cache)
         $cmd = 'sudo service nginx restart';
         $this->consoleExec($this->output, $cmd);
@@ -316,7 +325,8 @@ class Site extends WoodyCommand
     /**
      * Update site into his new core
      */
-    protected function deploy_site() {
+    protected function deploy_site()
+    {
         $cmd = sprintf('woody deploy:site -s %s -e %s', $this->site_key, $this->env);
         $this->consoleExec($this->output, $cmd);
         $this->exec($cmd);

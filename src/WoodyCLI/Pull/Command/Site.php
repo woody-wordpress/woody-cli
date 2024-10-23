@@ -56,6 +56,7 @@ class Site extends WoodyCommand
 
         $this->setEnv($input->getOption('env'));
         $this->setSiteKey($input->getOption('site'));
+        $this->setCoreKey($input->getOption('core'));
 
         // NOTE $this->setSiteKey() runs $this->loadSites() and verifies $this->siteIsConfigured($site_key)
         $this->site_config = $this->sites[$this->site_key];
@@ -84,7 +85,8 @@ class Site extends WoodyCommand
     /**
      * Checkouts Git branch
      */
-    protected function checkout_branch() {
+    protected function checkout_branch()
+    {
         $theme_folder = sprintf('%s/web/app/themes/%s', $this->current_core_path, $this->site_key);
         $cmd = sprintf('git checkout -B %s --track origin/%s', $this->git_branch, $this->git_branch);
         $this->consoleExec($this->output, $cmd);
@@ -94,7 +96,8 @@ class Site extends WoodyCommand
     /**
      * Pulls site
      */
-    protected function pull_site() {
+    protected function pull_site()
+    {
         $theme_folder = sprintf('%s/web/app/themes/%s', $this->current_core_path, $this->site_key);
         $cmd = 'git pull';
         $this->consoleExec($this->output, $cmd);
