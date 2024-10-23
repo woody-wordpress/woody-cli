@@ -104,11 +104,7 @@ class Site extends WoodyCommand
 
         if ($this->env == "dev") {
             $this->consoleH2($this->output, 'Déplacement des uploads dans le nouveau core (dev only)');
-            $helper = $this->getHelper('question');
-            $question = new ConfirmationQuestion('Voulez-vous vraiment déplacer les uploads de ce site - cela doit être fait en dev uniquement (N/y) ? ', false);
-            if (!$helper->ask($input, $output, $question)) {
-                $this->move_site_uploads();
-            }
+            $this->link_site_uploads();
         }
 
         $this->consoleH2($this->output, 'Changement de la configuration woody_status');
@@ -266,27 +262,23 @@ class Site extends WoodyCommand
     }
 
     /**
-     * Move site uploads into targeted core
+     * Link site uploads into targeted core
      */
-    protected function move_site_uploads()
+    protected function link_site_uploads()
     {
         $current_uploads_dir = sprintf('%s/web/app/uploads/%s', $this->current_core_path, $this->site_key);
         if (!$this->fs->exists($current_uploads_dir)) {
             $this->consoleH3($this->output, sprintf("Avertissement : aucun dossier d'uploads trouvé à l'emplacement '%s'", $current_uploads_dir));
             return;
         }
-
         $target_uploads_dir = sprintf('%s/web/app/uploads/%s', $this->target_core_path, $this->site_key);
         if ($this->fs->exists($target_uploads_dir)) {
-            $cmd = sprintf("sudo rm -rf %s", $target_uploads_dir);
+            $this->consoleH3($this->output, sprintf("Avertissement : un dossier d'uploads existe déjà à l'emplacement '%s'", $target_uploads_dir));
+        } else {
+            $cmd = sprintf("ln -s %s %s", $current_uploads_dir, $target_uploads_dir);
             $this->consoleExec($this->output, $cmd);
             $this->exec($cmd);
-            $this->consoleH3($this->output, sprintf("Avertissement : le dossier d'uploads trouvé dans le core cible à l'emplacement '%s', a été supprimé.", $target_uploads_dir));
         }
-
-        $cmd = sprintf("sudo mv %s %s", $current_uploads_dir, $target_uploads_dir);
-        $this->consoleExec($this->output, $cmd);
-        $this->exec($cmd);
     }
 
     /**
@@ -294,7 +286,6 @@ class Site extends WoodyCommand
      */
     protected function change_woody_status_config()
     {
-
         $current_core_yml_path = sprintf('/home/admin/www/woody_status/shared/config/%s.yml', $this->current_core_key);
         $this->consoleText($this->output, sprintf("retrait du site de la configuration '%s'", $current_core_yml_path));
         if ($this->fs->exists($current_core_yml_path)) {
