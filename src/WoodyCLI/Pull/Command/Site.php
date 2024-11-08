@@ -76,6 +76,7 @@ class Site extends WoodyCommand
 
         $this->consoleH1($this->output, sprintf("Pull du site '%s' du core '%s' depuis la branche '%s'", $this->site_key, $this->core_key, $this->git_branch));
         $this->woody_maintenance_on();
+        $this->fetch_remote();
         $this->checkout_branch();
         $this->pull_site();
         $this->reset_site();
@@ -87,6 +88,17 @@ class Site extends WoodyCommand
         }
 
         return WoodyCommand::SUCCESS;
+    }
+
+    /**
+     * Fetch Git remote
+     */
+    protected function fetch_remote()
+    {
+        $this->consoleH2($this->output, 'Git fetch');
+        $cmd = sprintf('git fetch');
+        $this->consoleExec($this->output, $cmd);
+        $this->execIn($this->theme_repo_path, $cmd);
     }
 
     /**
