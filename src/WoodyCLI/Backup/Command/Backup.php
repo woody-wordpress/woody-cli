@@ -67,6 +67,9 @@ class Backup extends WoodyCommand
 
         $this->setEnv($input->getOption('env'));
         $this->setSiteKey($input->getOption('site'));
+        $this->site_config = $this->sites[$this->site_key];
+        $this->setCoreKey($this->site_config['core']['key']);
+
         $this->version = time();
         $this->site_key_version = $this->site_key . '.' . $this->version;
 
@@ -82,8 +85,8 @@ class Backup extends WoodyCommand
         }
 
         // Is Install
-        $this->is_exist = $this->fs->exists(sprintf(self::WP_SITE_DIR, $this->site_key) . '/style.css');
-        $this->is_install = $this->fs->exists(sprintf(self::WP_SITE_UPLOADS_DIR . '/woody-cli.lock', $this->site_key));
+        $this->is_exist = $this->fs->exists(sprintf($this->paths['WP_SITE_DIR'], $this->core_key, $this->site_key) . '/style.css');
+        $this->is_install = $this->fs->exists(sprintf($this->paths['WP_SITE_UPLOADS_DIR'] . '/woody-cli.lock', $this->core_key, $this->site_key));
 
         if ($this->is_exist && $this->is_install) {
             $this->woody_maintenance_on();
@@ -131,9 +134,9 @@ class Backup extends WoodyCommand
 
         $this->consoleH2($this->output, 'Sauvegarde des images');
         if (in_array('no-thumbs', $options)) {
-            $cmd = sprintf("rsync -avz --exclude=thumbs %s %s", sprintf(self::WP_SITE_UPLOADS_DIR, $this->site_key), $this->release_path);
+            $cmd = sprintf("rsync -avz --exclude=thumbs %s %s", sprintf($this->paths['WP_SITE_UPLOADS_DIR'], $this->core_key, $this->site_key), $this->release_path);
         } else {
-            $cmd = sprintf("rsync -avz %s %s", sprintf(self::WP_SITE_UPLOADS_DIR, $this->site_key), $this->release_path);
+            $cmd = sprintf("rsync -avz %s %s", sprintf($this->paths['WP_SITE_UPLOADS_DIR'], $this->core_key, $this->site_key), $this->release_path);
         }
 
         $this->consoleExec($this->output, $cmd);

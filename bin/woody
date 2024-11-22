@@ -20,10 +20,12 @@
 
 use Symfony\Component\Console\Application;
 use WoodyCLI\Backup;
-use WoodyCLI\Deploy;
 use WoodyCLI\Build;
-use WoodyCLI\Cmd;
 use WoodyCLI\Cleaning;
+use WoodyCLI\Cmd;
+use WoodyCLI\Deploy;
+use WoodyCLI\Move;
+use WoodyCLI\Pull;
 
 if (PHP_SAPI !== 'cli') {
     echo 'Warning: Woody CLI should be invoked via the CLI version of PHP, not the ' . PHP_SAPI . ' SAPI' . PHP_EOL;
@@ -35,7 +37,6 @@ $vendorDir = preg_replace('/releases\\/[0-9]*/', 'current', $vendorDir);
 $vendorDir = str_replace('shared', 'current', $vendorDir);
 define('WP_VENDOR_DIR', $vendorDir);
 define('WP_ROOT_DIR', dirname(WP_VENDOR_DIR));
-define('WP_DEPLOY_DIR', dirname(WP_ROOT_DIR));
 
 // PHP Error
 error_reporting(-1);
@@ -80,12 +81,18 @@ if (is_file(WP_VENDOR_DIR . '/autoload.php')) {
  */
 $app = new Application();
 $app->setName('Woody CLI');
-$app->setVersion('1.21.2');
+$app->setVersion('1.22.0');
 
-// Deploy commands
+// Backup commands
 $app->add(new Backup\Command\Backup());
 $app->add(new Backup\Command\Restore());
 $app->add(new Backup\Command\Transfer());
+
+// Move commands
+$app->add(new Move\Command\Site());
+
+// Pull commands
+$app->add(new Pull\Command\Site());
 
 // Deploy commands
 $app->add(new Deploy\Command\Site());

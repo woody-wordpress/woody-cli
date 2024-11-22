@@ -7,6 +7,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
+use Woody\Status\Services\StatusManager;
 
 /**
  * Deploy
@@ -18,93 +19,15 @@ use Symfony\Component\Yaml\Yaml;
 abstract class WoodyCommand extends AbstractCommand
 {
     protected $output;
-
-    /**
-     * Path to gulp directory
-     * @var string
-     */
-    public const WP_GULP_DIR = WP_ROOT_DIR . '/gulp';
-
-    /**
-     * Path to the configuration file of a site (with wildcard)
-     * @var string
-     */
-    public const WP_CONFIG_DIRS = WP_ROOT_DIR . '/config/sites';
-
-    /**
-     * Path to site directory
-     * @var string
-     */
-    public const WP_THEMES_DIR = WP_ROOT_DIR . '/web/app/themes';
-
-    /**
-     * Path to site directory
-     * @var string
-     */
-    public const WP_SITE_DIR = self::WP_THEMES_DIR . '/%s';
-
-    /**
-     * Path to site directory
-     * @var string
-     */
-    public const WP_SITE_UPLOADS_DIR = WP_ROOT_DIR . '/web/app/uploads/%s';
-
-    /**
-     * Path to site directory
-     * @var string
-     */
-    public const WP_CACHE_DIR = WP_ROOT_DIR . '/web/app/cache';
-
-    /**
-     * Path to twig cache directory
-     * @var string
-     */
-    public const WP_TIMBER_DIR = self::WP_CACHE_DIR . '/timber';
-
-    /**
-     * Path to site directory
-     * @var string
-     */
-    public const WP_DEPLOY_SITE_DIR = WP_DEPLOY_DIR . '/sites/%s/current';
-
-    /**
-     * Path to the cli commands
-     * @var string
-     */
-    public const WP_SITE_CLI_DIR = self::WP_SITE_DIR . '/cli';
-
-    /**
-     * Loaded configuration
-     * @var array
-     */
     protected $sites = [];
-
-    /**
-     * Current site Key
-     * @var string
-     */
     protected $site_key;
-
-    /**
-     * Current env
-     * @var string
-     */
+    protected $core_key;
     protected $env = 'dev';
-
-    /**
-     * Current twig instance
-     */
     protected $twig;
-
-    /**
-     * Current fs instance
-     */
     protected $fs;
-
-    /**
-     * Lock status wp_cli
-     */
     protected $lock;
+    protected $paths;
+    protected $multicore;
 
     /**
      * __construct()
@@ -114,6 +37,31 @@ abstract class WoodyCommand extends AbstractCommand
     {
         parent::__construct($name);
         $this->fs = new Filesystem();
+
+        // Si CLI est dans woody_status, on est en multicore
+        $this->multicore = (strpos(WP_ROOT_DIR, 'woody_status') !== false);
+
+        // On essaye de trouver le core_path en fonction du chemin
+        $root_dir = explode('/', WP_ROOT_DIR);
+        if (count($root_dir) >= 2) {
+            end($root_dir);
+            if($this->multicore) {
+                // On obtient un chemin du type /home/admin/www/%s/current
+                $core_path = str_replace(prev($root_dir), '%s', WP_ROOT_DIR);
+            } else {
+                $this->core_key = prev($root_dir);
+                $core_path = WP_ROOT_DIR;
+            }
+        }
+
+        $this->paths = [
+            'WP_CORE_PATH' => $core_path,
+            'WP_CORES_PATH' => dirname(dirname(WP_ROOT_DIR)), // /home/admin/www
+            'WP_THEMES_PATH' => str_replace('%s', 'themes/%s', $core_path), // /home/admin/www/themes/%s/current
+            'WP_SITE_DIR' => $core_path . '/web/app/themes/%s', // /home/admin/www/%s/current/web/app/themes/%s
+            'WP_SITE_UPLOADS_DIR' => $core_path . '/web/app/uploads/%s', // /home/admin/www/%s/current/web/app/uploads/%s
+            'WP_SITE_CLI_DIR' => $core_path . '/web/app/themes/%s/cli', // /home/admin/www/%s/current/web/app/themes/%s/cli
+        ];
     }
 
     /**
@@ -127,6 +75,15 @@ abstract class WoodyCommand extends AbstractCommand
         }
 
         $this->site_key = $site_key;
+    }
+
+    /**
+    * Set the current core_key
+    * @param string $this->core_key
+    */
+    protected function setCoreKey($core_key)
+    {
+        $this->core_key = $core_key;
     }
 
     /**
@@ -166,7 +123,29 @@ abstract class WoodyCommand extends AbstractCommand
      */
     protected function loadSites()
     {
-        if (!file_exists(self::WP_CONFIG_DIRS)) {
+        if($this->multicore) {
+            return $this->loadSitesFromStatus();
+        } else {
+            return $this->loadSitesFromCore();
+        }
+    }
+
+    protected function loadSitesFromStatus()
+    {
+        $statusManager = new StatusManager();
+        $sites = $statusManager->getSites();
+        return $sites;
+    }
+
+    /**
+     * Return the list of available sites (listed in the index.yml file)
+     * @return array
+     * @throws \RuntimeException
+     */
+    protected function loadSitesFromCore()
+    {
+        $config_dirs = WP_ROOT_DIR . '/config/sites';
+        if (!file_exists($config_dirs)) {
             throw new \RuntimeException('Impossible de trouver des sites dans le répertoire de configuration');
         }
 
@@ -174,13 +153,13 @@ abstract class WoodyCommand extends AbstractCommand
         $sites = array();
 
         $finder = new Finder();
-        $finder->files()->followLinks()->ignoreDotFiles(false)->in(self::WP_CONFIG_DIRS)->name('.env');
+        $finder->files()->followLinks()->ignoreDotFiles(false)->in($config_dirs)->name('.env');
         foreach ($finder as $site) {
             $sites[$site->getRelativePath()] = $this->getDotEnv($site->getPathName());
         }
 
         $finder = new Finder();
-        $finder->files()->followLinks()->ignoreDotFiles(false)->in(self::WP_THEMES_DIR)->name('.env');
+        $finder->files()->followLinks()->ignoreDotFiles(false)->in(WP_ROOT_DIR . '/web/app/themes')->name('.env');
         foreach ($finder as $site) {
             $path = explode('/', $site->getRelativePath());
             if (!empty($path[0]) && !empty($path[2]) && $path[2] === $this->env) {
@@ -219,49 +198,56 @@ abstract class WoodyCommand extends AbstractCommand
             throw new \RuntimeException('Aucun site_key défini');
         }
 
-        $config = $this->sites[$this->site_key];
-        foreach ($config as $key => $val) {
-            $val = str_replace("'", '', $val);
-
-            if (strpos($val, '[') !== false) {
-                $val = str_replace(array('[', ']', '"', ' '), '', $val);
-                $val = (empty($val)) ? [] : explode(',', $val);
-            } elseif (strpos($val, 'true') !== false) {
-                $val = true;
-            } elseif (strpos($val, 'false') !== false) {
-                $val = false;
+        if ($this->multicore) {
+            $this->core_key = $this->sites[$this->site_key]['core']['key'];
+            return $this->sites[$this->site_key]['env'];
+        } else {
+            $root_dir = explode('/', WP_ROOT_DIR);
+            if (count($root_dir) >= 2) {
+                end($root_dir);
+                $this->core_key = prev($root_dir);
             }
-
-            $return[$key] = $val;
+            return $this->sites[$this->site_key];
         }
 
         return $return;
     }
 
-    /**
-     * Transform .env file to array PHP
-     *
-     * @param [string] $data
-     * @return array
-     */
-    protected function getDotEnv($path)
+    protected function array_env($env)
     {
-        $return = [];
+        $env = str_replace(array('[', ']', '"', ' '), '', $env);
+        $env = (empty($env)) ? [] : explode(',', $env);
+        sort($env);
+        return array_unique($env);
+    }
 
-        $data = file_get_contents($path);
-        if (!empty($data)) {
-            $lines = explode("\n", $data);
-            foreach ($lines as $line) {
-                if (empty($line)) {
-                    continue;
+    protected function getDotEnv($file)
+    {
+        $env = [];
+        $file = file_get_contents($file);
+        $file = explode("\n", $file);
+        foreach ($file as $line) {
+            if (!empty($line)) {
+                $line = explode('=', $line);
+                $key = $line[0];
+                $val = $line[1];
+                if (substr($val, 0, 1) == '"' || substr($val, 0, 1) == "'") {
+                    $val = substr(substr($val, 1), 0, -1);
                 }
 
-                $line = explode("=", $line);
-                $return[$line[0]] = $line[1];
+                if (substr($val, 0, 1) == '[' && substr($val, -1) == ']') {
+                    $val = self::array_env($val);
+                } elseif (strpos($val, 'false') !== false) {
+                    $val = false;
+                } elseif (strpos($val, 'true') !== false) {
+                    $val = true;
+                }
+
+                $env[$key] = $val;
             }
         }
 
-        return $return;
+        return $env;
     }
 
     /**
@@ -302,9 +288,9 @@ abstract class WoodyCommand extends AbstractCommand
         $config['00_init']['common'] = $start_config;
 
         // Search Yaml
-        if ($this->fs->exists(sprintf(self::WP_SITE_CLI_DIR, $this->site_key))) {
+        if ($this->fs->exists(sprintf($this->paths['WP_SITE_CLI_DIR'], $this->core_key, $this->site_key))) {
             $finder = new Finder();
-            $finder->files()->in(sprintf(self::WP_SITE_CLI_DIR, $this->site_key))->name('*.yml')->sortByName();
+            $finder->files()->in(sprintf($this->paths['WP_SITE_CLI_DIR'], $this->core_key, $this->site_key))->name('*.yml')->sortByName();
             foreach ($finder as $file) {
                 $migrate_key = str_replace('.yml', '', $file->getRelativePathname());
                 $config[$migrate_key] = $this->getConfig($file->getRealPath());
@@ -330,8 +316,8 @@ abstract class WoodyCommand extends AbstractCommand
 
         // Get Lock
         $lock = array();
-        if ($this->fs->exists(sprintf(self::WP_SITE_UPLOADS_DIR . '/woody-cli.lock', $this->site_key))) {
-            $lock = $this->getConfig(sprintf(self::WP_SITE_UPLOADS_DIR . '/woody-cli.lock', $this->site_key));
+        if ($this->fs->exists(sprintf($this->paths['WP_SITE_UPLOADS_DIR'] . '/woody-cli.lock', $this->core_key, $this->site_key))) {
+            $lock = $this->getConfig(sprintf($this->paths['WP_SITE_UPLOADS_DIR'] . '/woody-cli.lock', $this->core_key, $this->site_key));
             $lock = $lock['commands'];
         }
 
@@ -358,7 +344,7 @@ abstract class WoodyCommand extends AbstractCommand
     protected function wp($command, $exit_on_fail = true)
     {
         try {
-            $callback = $this->execIn(WP_ROOT_DIR, sprintf('WP_SITE_KEY=%s wp %s --allow-root', $this->site_key, $command));
+            $callback = $this->execIn(sprintf($this->paths['WP_CORE_PATH'], $this->core_key), sprintf('WP_SITE_KEY=%s ./bin/wp %s --allow-root', $this->site_key, $command));
             return $callback;
         } catch (\Exception $exception) {
             if ($exit_on_fail) {
@@ -380,7 +366,7 @@ abstract class WoodyCommand extends AbstractCommand
             'commands' => $this->lock
         ));
 
-        $this->fs->dumpFile(sprintf(self::WP_SITE_UPLOADS_DIR . '/woody-cli.lock', $this->site_key), $lock);
+        $this->fs->dumpFile(sprintf($this->paths['WP_SITE_UPLOADS_DIR'] . '/woody-cli.lock', $this->core_key, $this->site_key), $lock);
     }
 
     /**
@@ -390,7 +376,7 @@ abstract class WoodyCommand extends AbstractCommand
      */
     protected function wp_unlock()
     {
-        $this->fs->remove(sprintf(self::WP_SITE_UPLOADS_DIR, $this->site_key));
+        $this->fs->remove(sprintf($this->paths['WP_SITE_UPLOADS_DIR'], $this->core_key, $this->site_key));
     }
 
     // WP Maintenance ON

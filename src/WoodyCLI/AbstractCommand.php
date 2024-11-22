@@ -195,7 +195,7 @@ abstract class AbstractCommand extends Command
     public function directoryIsEmpty($path)
     {
         $content = scandir($path);
-        $content = array_filter($content, fn($entry) => $entry !== '.' && $entry !== '..');
+        $content = array_filter($content, fn ($entry) => $entry !== '.' && $entry !== '..');
 
         return $content === [];
     }
@@ -222,7 +222,7 @@ abstract class AbstractCommand extends Command
      */
     protected function flattenArray($array)
     {
-        return is_array($array) ? array_reduce($array, fn($c, $a) => array_merge($c, $this->flattenArray($a)), []) : [$array];
+        return is_array($array) ? array_reduce($array, fn ($c, $a) => array_merge($c, $this->flattenArray($a)), []) : [$array];
     }
 
     ////////////////////
@@ -242,6 +242,13 @@ abstract class AbstractCommand extends Command
         $outputFormatterStyle = new OutputFormatterStyle('yellow', null, array());
         $output->getFormatter()->setStyle('h2', $outputFormatterStyle);
         $output->writeln(sprintf('<h2>*** %s</>', mb_strtoupper($msg)));
+    }
+
+    protected function consoleH3($output, $msg)
+    {
+        $outputFormatterStyle = new OutputFormatterStyle('magenta', null, array());
+        $output->getFormatter()->setStyle('h3', $outputFormatterStyle);
+        $output->writeln(sprintf('<h3>### %s</>', $msg));
     }
 
     protected function consoleList($output, $msg, $current = 0, $max = 0)

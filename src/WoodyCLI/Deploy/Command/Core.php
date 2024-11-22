@@ -31,6 +31,7 @@ class Core extends WoodyCommand
             ->setName('deploy:core')
             ->setDescription('Déployer le core')
             // Options
+            ->addOption('core', 'c', InputOption::VALUE_OPTIONAL, 'Core', null)
             ->addOption('env', 'e', InputOption::VALUE_OPTIONAL, 'Environnement', 'dev');
     }
 
@@ -51,17 +52,17 @@ class Core extends WoodyCommand
 
     private function symlinks()
     {
-        if ($this->env != 'dev') {
-            $this->sites = $this->loadSites();
-            $this->consoleH2($this->output, 'Installation des symlinks de sites');
-            foreach (array_keys($this->sites) as $site_key) {
-                $this->symlink(sprintf(self::WP_DEPLOY_SITE_DIR, $site_key), sprintf(self::WP_SITE_DIR, $site_key));
-                $this->consoleExec($this->output, sprintf($site_key . ' (%s)', sprintf(self::WP_SITE_DIR, $site_key)));
+        $this->sites = $this->loadSites();
+        $this->consoleH2($this->output, 'Installation des symlinks de sites');
+
+        foreach ($this->sites as $site_key => $site) {
+            $core_key = $site['core']['key'];
+            if(!empty($this->input->getOption('core')) && $core_key != $this->input->getOption('core')) {
+                continue;
             }
-        } else {
-            $this->consoleH2($this->output, 'Installation du symlink de config');
-            $this->symlink(WP_DEPLOY_DIR . '/shared/config/sites', parent::WP_CONFIG_DIRS);
-            $this->consoleExec($this->output, sprintf('%s >> %s', WP_DEPLOY_DIR . '/shared/config/sites', parent::WP_CONFIG_DIRS));
+
+            $this->symlink(sprintf($this->paths['WP_THEMES_PATH'], $site_key), sprintf($this->paths['WP_SITE_DIR'], $core_key, $site_key));
+            $this->consoleExec($this->output, sprintf('%s : %s (%s > %s)', $core_key, $site_key, sprintf('/home/admin/www/themes/%s/current', $site_key), sprintf($this->paths['WP_SITE_DIR'], $core_key, $site_key)));
         }
     }
 }

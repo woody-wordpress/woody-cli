@@ -63,6 +63,8 @@ class Restore extends WoodyCommand
         $this->setEnv($input->getOption('env'));
         $this->setSiteKey($input->getOption('site'));
         $this->version = $input->getOption('timestamp');
+        $this->site_config = $this->sites[$this->site_key];
+        $this->setCoreKey($this->site_config['core']['key']);
 
         // Backup path
         $path = $input->getOption('path');
@@ -78,7 +80,7 @@ class Restore extends WoodyCommand
         }
 
         // Is Install
-        $this->is_exist = $this->fs->exists(sprintf(self::WP_SITE_DIR, $this->site_key) . '/style.css');
+        $this->is_exist = $this->fs->exists(sprintf($this->paths['WP_SITE_DIR'], $this->core_key, $this->site_key) . '/style.css');
 
         if ($this->is_exist) {
             $this->restore_ungzip();
@@ -114,7 +116,7 @@ class Restore extends WoodyCommand
         if (!file_exists($this->version_path . '/' . $this->site_key)) {
             $this->consoleExec($this->output, 'Opération annulée : répertoire inexistant');
         } else {
-            $cmd = sprintf("rsync --ignore-existing --del -avzO %s %s", $this->version_path . '/' . $this->site_key, sprintf(self::WP_SITE_UPLOADS_DIR, ''));
+            $cmd = sprintf("rsync --ignore-existing --del -avzO %s %s", $this->version_path . '/' . $this->site_key, sprintf($this->paths['WP_SITE_UPLOADS_DIR'], $this->core_key, ''));
             $this->consoleExec($this->output, $cmd);
             $this->exec($cmd);
 
@@ -150,6 +152,12 @@ class Restore extends WoodyCommand
             $cmd = sprintf('woody deploy:site -s %s -e %s', $this->site_key, $this->env);
             $this->consoleExec($this->output, $cmd);
             $this->execIn($this->version_path, $cmd);
+
+            if ($this->env == 'dev') {
+                $cmd = 'cache flush';
+                $this->consoleExec($this->output, $cmd);
+                $this->wp($cmd);
+            }
         }
     }
 
