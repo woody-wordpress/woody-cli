@@ -69,12 +69,12 @@ class Children extends WoodyCommand
             $sites = array_keys($sites);
             $this->consoleH1($this->output, sprintf("Recherche des enfants de %s sites", count($sites)));
         }
-        $this->consoleText($this->output, sprintf("Considérez que la recherche se base sur la présence du site_key parent dans les feuilles de styles des thèmes enfants dans %s", $all_themes_path));
+        $this->consoleText($this->output, sprintf("La recherche se base sur la présence du site_key parent dans les feuilles de styles des thèmes enfants dans %s", $all_themes_path));
 
         foreach ($sites as $site_key) {
-            $finder_grep = "/@import\\s+\"" . $site_key . "\\/src/";
+            $finder_grep = "/@import\\s+\"" . $site_key . "\\/src/i";
             $finder_children = new Finder();
-            $finder_children->files()->followLinks()->ignoreDotFiles(true)->in($all_themes_path)->name('*.scss')->depth(['>= 4', '<= 5'])->contains("/@import\\s+\"" . $site_key . "\\/src/i");
+            $finder_children->files()->followLinks()->ignoreDotFiles(true)->in($all_themes_path)->name('*.scss')->depth(['>= 4', '<= 5'])->contains($finder_grep);
             $matchingFiles = [];
             if ($finder_children->hasResults()) {
                 foreach ($finder_children as $file) {
