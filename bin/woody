@@ -24,6 +24,7 @@ use WoodyCLI\Build;
 use WoodyCLI\Cleaning;
 use WoodyCLI\Cmd;
 use WoodyCLI\Deploy;
+use WoodyCLI\Info;
 use WoodyCLI\Move;
 use WoodyCLI\Pull;
 
@@ -90,6 +91,9 @@ $app->add(new Backup\Command\Transfer());
 
 // Move commands
 $app->add(new Move\Command\Site());
+
+// List commands
+$app->add(new Info\Command\Children());
 
 // Pull commands
 $app->add(new Pull\Command\Site());
