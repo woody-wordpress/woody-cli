@@ -74,7 +74,7 @@ class Children extends WoodyCommand
         foreach ($sites as $site_key) {
             $finder_grep = "/@import\\s+\"" . $site_key . "\\/src/i";
             $finder_children = new Finder();
-            $finder_children->files()->followLinks()->ignoreDotFiles(true)->in($all_themes_path)->name('*.scss')->depth(['>= 4', '<= 5'])->contains($finder_grep);
+            $finder_children->files()->followLinks()->ignoreDotFiles(true)->in($all_themes_path)->notPath('releases')->name('*.scss')->depth(['>= 4', '<= 5'])->contains($finder_grep);
             $matchingFiles = [];
             if ($finder_children->hasResults()) {
                 foreach ($finder_children as $file) {
