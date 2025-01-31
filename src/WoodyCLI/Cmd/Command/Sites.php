@@ -68,14 +68,20 @@ class Sites extends WoodyCommand
         foreach ($sites as $site_key => $site_config) {
             $this->consoleH2($this->output, sprintf('%s/%s %s', $i, $nb_sites, $site_key));
             $site_config = $this->getSiteConfiguration($site_key);
-            $is_cloned = $this->fs->exists(sprintf($this->paths['WP_SITE_DIR'], $this->core_key, $site_key) . '/style.css');
 
-            // Site access locked
-            if (!$is_cloned || (!empty($site_config['WOODY_ACCESS_LOCKED']) && $site_config['WOODY_ACCESS_LOCKED'])) {
-                $this->consoleH1($this->output, sprintf('Projet "%s" fermé', $this->site_key));
+            if (empty($site_config)) {
+                $this->consoleH1($this->output, sprintf('Projet "%s" sans configuration', $this->site_key));
             } else {
-                $this->consoleExec($this->output, sprintf('WP_SITE_KEY=%s wp %s', $site_key, $wp));
-                $this->exec(sprintf('WP_SITE_KEY=%s wp %s', $site_key, $wp), 86400);
+
+                $is_cloned = $this->fs->exists(sprintf($this->paths['WP_SITE_DIR'], $this->core_key, $site_key) . '/style.css');
+
+                // Site access locked
+                if (!$is_cloned || (!empty($site_config['WOODY_ACCESS_LOCKED']) && $site_config['WOODY_ACCESS_LOCKED'])) {
+                    $this->consoleH1($this->output, sprintf('Projet "%s" fermé', $this->site_key));
+                } else {
+                    $this->consoleExec($this->output, sprintf('WP_SITE_KEY=%s wp %s', $site_key, $wp));
+                    $this->exec(sprintf('WP_SITE_KEY=%s wp %s', $site_key, $wp), 86400);
+                }
             }
 
             ++$i;
