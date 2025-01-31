@@ -184,8 +184,6 @@ abstract class WoodyCommand extends AbstractCommand
      */
     protected function getSiteConfiguration($site_key = null)
     {
-        $return = [];
-
         if (empty($this->sites)) {
             $this->sites = $this->loadSites();
         }
@@ -200,7 +198,9 @@ abstract class WoodyCommand extends AbstractCommand
 
         if ($this->multicore) {
             $this->core_key = $this->sites[$this->site_key]['core']['key'];
-            return $this->sites[$this->site_key]['env'];
+            if (isset($this->sites[$this->site_key]['env'])) {
+                return $this->sites[$this->site_key]['env'];
+            }
         } else {
             $root_dir = explode('/', WP_ROOT_DIR);
             if (count($root_dir) >= 2) {
@@ -210,7 +210,7 @@ abstract class WoodyCommand extends AbstractCommand
             return $this->sites[$this->site_key];
         }
 
-        return $return;
+        return [];
     }
 
     protected function array_env($env)

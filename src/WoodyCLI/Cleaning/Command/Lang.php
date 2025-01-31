@@ -62,6 +62,10 @@ class Lang extends WoodyCommand
             throw new \RuntimeException('Aucune langue définie');
         }
 
+        if (empty($this->site_config)) {
+            throw new \RuntimeException('Aucune configuration pour ce site');
+        }
+
         $langs = explode(',', $langs);
         $this->setSiteKey($input->getOption('site'));
 
